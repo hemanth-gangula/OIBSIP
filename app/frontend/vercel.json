@@ -3,9 +3,6 @@
   "buildCommand": "npm run build",
   "outputDirectory": ".next",
   "installCommand": "npm install --legacy-peer-deps",
-  "env": {
-    "NEXT_PUBLIC_API_URL": "@fraud_api_url"
-  },
   "headers": [
     {
       "source": "/(.*)",
