@@ -1,0 +1,35 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Root requirements — ML pipeline, notebook, and evaluation scripts
+# Install with:  pip install -r requirements.txt
+# Python 3.10+ recommended
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Core data science
+numpy==1.26.4
+pandas==2.2.3
+scipy==1.13.1
+
+# Machine learning
+scikit-learn==1.5.2
+imbalanced-learn==0.12.3
+
+# Visualisation
+matplotlib==3.9.2
+seaborn==0.13.2
+
+# Model serialisation
+joblib==1.4.2
+
+# Jupyter notebook
+jupyter==1.0.0
+ipykernel==6.29.5
+nbformat==5.10.4
+
+# API backend (also listed separately in app/backend/requirements.txt)
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+pydantic==2.9.2
+python-multipart==0.0.12
+
+# Testing
+httpx==0.27.0

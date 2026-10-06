@@ -1,0 +1,15 @@
+{
+  "total_transactions": 284807,
+  "legitimate_count": 284315,
+  "fraud_count": 492,
+  "fraud_pct": 0.1727,
+  "legit_pct": 99.8273,
+  "imbalance_ratio": 577,
+  "time_span_hours": 48,
+  "fraud_mean_amount": 122.21,
+  "fraud_max_amount": 2125.87,
+  "fraud_median_amount": 9.25,
+  "legit_mean_amount": 88.29,
+  "legit_max_amount": 25691.16,
+  "legit_median_amount": 22.0
+}

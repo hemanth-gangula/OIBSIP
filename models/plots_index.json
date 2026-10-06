@@ -1,0 +1,15 @@
+{
+  "class_distribution": "01_class_distribution.png",
+  "amount_distribution_by_class": "02_amount_distribution_by_class.png",
+  "time_of_day_fraud": "03_time_of_day_fraud.png",
+  "fraud_amount_boxplot": "04_fraud_amount_boxplot.png",
+  "correlation_heatmap_fraud": "05_correlation_heatmap_fraud.png",
+  "pca_feature_distributions": "06_pca_feature_distributions.png",
+  "confusion_matrix_lr": "07_confusion_matrix_lr.png",
+  "confusion_matrix_rf": "08_confusion_matrix_rf.png",
+  "roc_curves": "09_roc_curves.png",
+  "precision_recall_curves": "10_precision_recall_curves.png",
+  "model_comparison_bar": "11_model_comparison_bar.png",
+  "lr_feature_importance": "12_lr_feature_importance.png",
+  "rf_feature_importance": "13_rf_feature_importance.png"
+}
