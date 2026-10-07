@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard – Play Store Analytics</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+</head>
+<body>
+
+<!-- ── Navbar ──────────────────────────────── -->
+<nav class="navbar">
+  <div class="navbar-brand">
+    <div class="logo-icon">📊</div>
+    <span>Play Store Analytics</span>
+    <span class="navbar-badge">L2 · T4</span>
+  </div>
+  <div class="navbar-links">
+    <a href="/">⬆ Upload New Datasets</a>
+  </div>
+</nav>
+
+<!-- ── Layout ──────────────────────────────── -->
+<div class="dashboard-layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-title">Navigation</div>
+    <nav class="sidebar-nav">
+      <a href="#overview"      class="active"><span class="nav-icon">🏠</span> Overview</a>
+      <a href="#data-quality">          <span class="nav-icon">🧹</span> Data Quality</a>
+      <a href="#categories">            <span class="nav-icon">📂</span> Category Analysis</a>
+      <a href="#ratings">               <span class="nav-icon">⭐</span> Ratings Analysis</a>
+      <a href="#size-installs">         <span class="nav-icon">📦</span> Size &amp; Installs</a>
+      <a href="#pricing">               <span class="nav-icon">💰</span> Pricing Analysis</a>
+      <a href="#sentiment">             <span class="nav-icon">😊</span> User Sentiment</a>
+      <a href="#sentiment-cat">         <span class="nav-icon">📊</span> Sentiment by Category</a>
+      <a href="#interactive">           <span class="nav-icon">🔬</span> Interactive Analysis</a>
+      <a href="#insights">              <span class="nav-icon">💡</span> Developer Insights</a>
+    </nav>
+  </aside>
+
+  <!-- Main -->
+  <main class="main-content">
+
+    <!-- ══ OVERVIEW ══════════════════════════ -->
+    <section class="section fade-up" id="overview">
+      <div class="section-header">
+        <div class="section-icon">🏠</div>
+        <div>
+          <h2>Overview</h2>
+          <p>Key metrics computed dynamically from your uploaded datasets</p>
+        </div>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-icon">📱</div>
+          <div class="kpi-value">{{ "{:,}".format(analysis.kpis.total_apps) }}</div>
+          <div class="kpi-label">Total Apps</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon">📂</div>
+          <div class="kpi-value">{{ analysis.kpis.total_categories }}</div>
+          <div class="kpi-label">Categories</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon">⭐</div>
+          <div class="kpi-value">{{ analysis.kpis.avg_rating }}</div>
+          <div class="kpi-label">Avg Rating</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon">📥</div>
+          <div class="kpi-value">
+            {% set inst = analysis.kpis.total_installs %}
+            {% if inst >= 1000000000 %}{{ "%.1f"|format(inst/1000000000) }}B
+            {% elif inst >= 1000000  %}{{ "%.1f"|format(inst/1000000) }}M
+            {% elif inst >= 1000     %}{{ "%.0f"|format(inst/1000) }}K
+            {% else %}{{ inst }}{% endif %}
+          </div>
+          <div class="kpi-label">Total Installs</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon">🆓</div>
+          <div class="kpi-value">{{ analysis.kpis.free_pct }}%</div>
+          <div class="kpi-label">Free Apps</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon">💲</div>
+          <div class="kpi-value">{{ analysis.kpis.paid_pct }}%</div>
+          <div class="kpi-label">Paid Apps</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon">💬</div>
+          <div class="kpi-value">{{ "{:,}".format(analysis.kpis.total_user_reviews) }}</div>
+          <div class="kpi-label">User Reviews</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon">😊</div>
+          <div class="kpi-value" style="color:var(--positive)">{{ analysis.kpis.positive_pct }}%</div>
+          <div class="kpi-label">Positive Reviews</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon">😞</div>
+          <div class="kpi-value" style="color:var(--negative)">{{ analysis.kpis.negative_pct }}%</div>
+          <div class="kpi-label">Negative Reviews</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon">😐</div>
+          <div class="kpi-value" style="color:var(--neutral)">{{ analysis.kpis.neutral_pct }}%</div>
+          <div class="kpi-label">Neutral Reviews</div>
+        </div>
+      </div>
+
+      <div class="info-box mt-2">
+        <strong>Sentiment engine:</strong> {{ analysis.engine_used }} &nbsp;·&nbsp;
+        <strong>Merged reviews:</strong> {{ "{:,}".format(analysis.sentiment_cat.merged_rows) }} rows matched across datasets
+      </div>
+    </section>
+
+    <!-- ══ DATA QUALITY ═══════════════════════ -->
+    <section class="section fade-up" id="data-quality">
+      <div class="section-header">
+        <div class="section-icon">🧹</div>
+        <div>
+          <h2>Data Quality &amp; Cleaning Report</h2>
+          <p>Cleaning decisions applied to the uploaded datasets</p>
+        </div>
+      </div>
+
+      <div class="quality-grid">
+        <div class="quality-card">
+          <h4>📱 Apps Dataset</h4>
+          {% for k, v in analysis.apps_log.items() %}
+          <div class="quality-row">
+            <span class="qlabel">{{ k.replace('_',' ').title() }}</span>
+            <span class="qvalue {% if 'removed' in k or 'dropped' in k or 'nulled' in k %}{% if v > 0 %}warn{% else %}good{% endif %}{% else %}good{% endif %}">{{ v }}</span>
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class="quality-card">
+          <h4>💬 Reviews Dataset</h4>
+          {% for k, v in analysis.reviews_log.items() %}
+          <div class="quality-row">
+            <span class="qlabel">{{ k.replace('_',' ').title() }}</span>
+            <span class="qvalue {% if 'removed' in k or 'dropped' in k %}{% if v > 0 %}warn{% else %}good{% endif %}{% else %}good{% endif %}">{{ v }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="info-box mt-2">
+        <strong>Cleaning methodology:</strong>
+        Removed duplicate app entries (kept first occurrence) ·
+        Converted <code>Installs</code> (e.g. "10,000+") to integers ·
+        Converted <code>Price</code> (e.g. "$4.99") to float ·
+        Converted <code>Size</code> ("19M", "1.5k") to float MB ·
+        Nulled ratings outside [1–5] range ·
+        Normalised <code>Type</code> to Free/Paid ·
+        Cleaned <code>Sentiment</code> labels to Positive/Negative/Neutral
+      </div>
+    </section>
+
+    <!-- ══ CATEGORY ANALYSIS ══════════════════ -->
+    <section class="section fade-up" id="categories">
+      <div class="section-header">
+        <div class="section-icon">📂</div>
+        <div>
+          <h2>Category Analysis</h2>
+          <p>Distribution of apps across {{ analysis.kpis.total_categories }} categories</p>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <h3>Top 20 Categories by App Count</h3>
+        <img src="data:image/png;base64,{{ analysis.charts.category_dist }}" alt="Category Distribution" loading="lazy" />
+      </div>
+
+      <div class="quality-card mt-2">
+        <h4>🔥 Most Saturated Categories (Top 5)</h4>
+        <div class="cat-table-wrap">
+          <table class="cat-table">
+            <thead><tr><th>#</th><th>Category</th><th>App Count</th></tr></thead>
+            <tbody>
+              {% for i, cat in enumerate(analysis.category_data.top5_saturated) %}
+              {% set count = analysis.category_data.category_counts | selectattr('Category','equalto',cat) | map(attribute='App_Count') | first | default(0) %}
+              <tr>
+                <td><span class="rank-badge">{{ i+1 }}</span></td>
+                <td>{{ cat }}</td>
+                <td>{{ "{:,}".format(count | int) }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ RATINGS ════════════════════════════ -->
+    <section class="section fade-up" id="ratings">
+      <div class="section-header">
+        <div class="section-icon">⭐</div>
+        <div>
+          <h2>Ratings Analysis</h2>
+          <p>Overall average: <strong>{{ analysis.rating_data.avg_overall }}★</strong>
+             across {{ "{:,}".format(analysis.rating_data.total_rated) }} rated apps</p>
+        </div>
+      </div>
+
+      <div class="charts-grid">
+        <div class="chart-card">
+          <h3>Rating Distribution</h3>
+          <img src="data:image/png;base64,{{ analysis.charts.rating_dist }}" alt="Rating Distribution" loading="lazy" />
+        </div>
+        <div class="chart-card">
+          <h3>Average Rating by Category</h3>
+          <img src="data:image/png;base64,{{ analysis.charts.avg_rating_cat }}" alt="Avg Rating by Category" loading="lazy" />
+        </div>
+      </div>
+
+      <div class="quality-card mt-2">
+        <h4>📊 Rating Distribution Breakdown</h4>
+        <div class="cat-table-wrap">
+          <table class="cat-table">
+            <thead><tr><th>Rating Range</th><th>App Count</th></tr></thead>
+            <tbody>
+              {% for row in analysis.rating_data.distribution %}
+              <tr>
+                <td>{{ row.Range }}</td>
+                <td>{{ "{:,}".format(row.Count | int) }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ SIZE & INSTALLS ════════════════════ -->
+    <section class="section fade-up" id="size-installs">
+      <div class="section-header">
+        <div class="section-icon">📦</div>
+        <div>
+          <h2>Size &amp; Installs Analysis</h2>
+          <p>Pearson correlation r = <strong>{{ analysis.size_inst_data.correlation }}</strong></p>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <h3>App Size vs Install Count (scatter with trend)</h3>
+        <img src="data:image/png;base64,{{ analysis.charts.size_installs }}" alt="Size vs Installs" loading="lazy" />
+      </div>
+
+      <div class="info-box mt-2">
+        <strong>Correlation r = {{ analysis.size_inst_data.correlation }}</strong><br />
+        {{ analysis.size_inst_data.note }}<br />
+        <span class="text-muted">Based on {{ "{:,}".format(analysis.size_inst_data.total_points) }} apps with valid size and install data.</span>
+      </div>
+    </section>
+
+    <!-- ══ PRICING ════════════════════════════ -->
+    <section class="section fade-up" id="pricing">
+      <div class="section-header">
+        <div class="section-icon">💰</div>
+        <div>
+          <h2>Pricing Analysis</h2>
+          <p>Free: {{ analysis.pricing_data.free_pct }}% &nbsp;·&nbsp; Paid: {{ analysis.pricing_data.paid_pct }}%</p>
+        </div>
+      </div>
+
+      <div class="charts-grid">
+        <div class="chart-card">
+          <h3>Free vs Paid Distribution</h3>
+          <img src="data:image/png;base64,{{ analysis.charts.free_paid }}" alt="Free vs Paid" loading="lazy" />
+        </div>
+        <div class="chart-card">
+          <h3>Paid App Price Distribution</h3>
+          <img src="data:image/png;base64,{{ analysis.charts.price_dist }}" alt="Price Distribution" loading="lazy" />
+        </div>
+      </div>
+
+      <div class="chart-card mt-2">
+        <h3>Estimated Revenue by Category (Top 10 Paid)</h3>
+        <img src="data:image/png;base64,{{ analysis.charts.revenue_cat }}" alt="Revenue by Category" loading="lazy" />
+      </div>
+
+      <div class="info-box mt-2">
+        <strong>⚠️ Revenue Estimation Disclaimer</strong><br />
+        {{ analysis.pricing_data.revenue_formula }}
+      </div>
+    </section>
+
+    <!-- ══ SENTIMENT ══════════════════════════ -->
+    <section class="section fade-up" id="sentiment">
+      <div class="section-header">
+        <div class="section-icon">😊</div>
+        <div>
+          <h2>User Review Sentiment Analysis</h2>
+          <p>Engine: {{ analysis.sentiment_data.engine_used }} &nbsp;·&nbsp; Source: {{ analysis.sentiment_data.label_source }}</p>
+        </div>
+      </div>
+
+      <div class="sentiment-cards">
+        <div class="sentiment-card sc-positive">
+          <div class="sval">{{ analysis.kpis.positive_pct }}%</div>
+          <div class="slabel">😊 Positive</div>
+          <div class="text-muted" style="font-size:0.8rem;margin-top:0.3rem;">
+            {{ "{:,}".format(analysis.sentiment_data.positive_count) }} reviews
+          </div>
+        </div>
+        <div class="sentiment-card sc-negative">
+          <div class="sval">{{ analysis.kpis.negative_pct }}%</div>
+          <div class="slabel">😞 Negative</div>
+          <div class="text-muted" style="font-size:0.8rem;margin-top:0.3rem;">
+            {{ "{:,}".format(analysis.sentiment_data.negative_count) }} reviews
+          </div>
+        </div>
+        <div class="sentiment-card sc-neutral">
+          <div class="sval">{{ analysis.kpis.neutral_pct }}%</div>
+          <div class="slabel">😐 Neutral</div>
+          <div class="text-muted" style="font-size:0.8rem;margin-top:0.3rem;">
+            {{ "{:,}".format(analysis.sentiment_data.neutral_count) }} reviews
+          </div>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <h3>Sentiment Distribution</h3>
+        <img src="data:image/png;base64,{{ analysis.charts.sentiment_dist }}" alt="Sentiment Distribution" loading="lazy" />
+      </div>
+    </section>
+
+    <!-- ══ SENTIMENT BY CATEGORY ══════════════ -->
+    <section class="section fade-up" id="sentiment-cat">
+      <div class="section-header">
+        <div class="section-icon">📊</div>
+        <div>
+          <h2>Sentiment by Category</h2>
+          <p>{{ "{:,}".format(analysis.sentiment_cat.merged_rows) }} reviews matched across both datasets</p>
+        </div>
+      </div>
+
+      {% if analysis.sentiment_cat.merged_rows > 0 %}
+      <div class="chart-card">
+        <h3>Stacked Sentiment by Category (Top 15)</h3>
+        <img src="data:image/png;base64,{{ analysis.charts.sentiment_cat }}" alt="Sentiment by Category" loading="lazy" />
+      </div>
+
+      <div class="charts-grid mt-2">
+        <div class="quality-card">
+          <h4>🌟 Most Positive Categories</h4>
+          <div class="cat-table-wrap">
+            <table class="cat-table">
+              <thead><tr><th>#</th><th>Category</th><th>Positive %</th></tr></thead>
+              <tbody>
+                {% for i, row in enumerate(analysis.sentiment_cat.most_positive) %}
+                <tr>
+                  <td><span class="rank-badge">{{ i+1 }}</span></td>
+                  <td>{{ row.Category }}</td>
+                  <td style="color:var(--positive);font-weight:700;">{{ row.Positive_Pct }}%</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="quality-card">
+          <h4>⚡ Most Negative Categories</h4>
+          <div class="cat-table-wrap">
+            <table class="cat-table">
+              <thead><tr><th>#</th><th>Category</th><th>Negative %</th></tr></thead>
+              <tbody>
+                {% for i, row in enumerate(analysis.sentiment_cat.most_negative) %}
+                <tr>
+                  <td><span class="rank-badge">{{ i+1 }}</span></td>
+                  <td>{{ row.Category }}</td>
+                  <td style="color:var(--negative);font-weight:700;">{{ row.Negative_Pct }}%</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      {% else %}
+      <div class="status-msg info">
+        ℹ️ No matching apps found between the two datasets. Ensure both files share the same App names in the "App" column.
+        {% if analysis.sentiment_cat.note %}{{ analysis.sentiment_cat.note }}{% endif %}
+      </div>
+      {% endif %}
+    </section>
+
+    <!-- ══ INTERACTIVE ANALYSIS ═══════════════ -->
+    <section class="section fade-up" id="interactive">
+      <div class="section-header">
+        <div class="section-icon">🔬</div>
+        <div>
+          <h2>Interactive Analysis</h2>
+          <p>Explore the data with interactive Plotly visualisations</p>
+        </div>
+      </div>
+
+      <div class="plotly-tabs">
+        <button class="ptab active" onclick="showTab('bubble',this)">🫧 Category Bubble</button>
+        <button class="ptab" onclick="showTab('violin',this)">🎻 Rating Violin</button>
+        <button class="ptab" onclick="showTab('installs',this)">📥 Top Installs</button>
+        <button class="ptab" onclick="showTab('sunburst',this)">🌞 Sunburst</button>
+      </div>
+
+      <div class="plotly-container">
+        {% set pc = analysis.plotly_charts %}
+
+        <div class="plotly-panel active" id="panel-bubble">
+          {% if pc.bubble %}
+          <div id="plot-bubble"></div>
+          {% else %}<div class="status-msg info">Chart unavailable – insufficient data.</div>{% endif %}
+        </div>
+
+        <div class="plotly-panel" id="panel-violin">
+          {% if pc.violin %}
+          <div id="plot-violin"></div>
+          {% else %}<div class="status-msg info">Chart unavailable – insufficient data.</div>{% endif %}
+        </div>
+
+        <div class="plotly-panel" id="panel-installs">
+          {% if pc.installs %}
+          <div id="plot-installs"></div>
+          {% else %}<div class="status-msg info">Chart unavailable – insufficient data.</div>{% endif %}
+        </div>
+
+        <div class="plotly-panel" id="panel-sunburst">
+          {% if pc.sunburst %}
+          <div id="plot-sunburst"></div>
+          {% else %}<div class="status-msg info">Chart unavailable – insufficient data.</div>{% endif %}
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ DEVELOPER INSIGHTS ═════════════════ -->
+    <section class="section fade-up" id="insights">
+      <div class="section-header">
+        <div class="section-icon">💡</div>
+        <div>
+          <h2>Developer Insights</h2>
+          <p>Data-driven recommendations based on your uploaded Google Play Store data</p>
+        </div>
+      </div>
+
+      {% if analysis.insights %}
+      <div class="insight-grid">
+        {% for insight in analysis.insights %}
+        <div class="insight-card">
+          <h4>{{ insight.title }}</h4>
+          <p>{{ insight.body | safe }}</p>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="status-msg info">No insights generated – check that both datasets were processed correctly.</div>
+      {% endif %}
+
+      <div class="info-box mt-2">
+        <strong>Note:</strong> All insights are computed dynamically from the datasets you uploaded.
+        No values are hardcoded. Results will differ based on your specific dataset version and date range.
+      </div>
+    </section>
+
+  </main>
+</div><!-- /.dashboard-layout -->
+
+<!-- ── Footer ──────────────────────────────── -->
+<footer class="footer">
+  <strong>Google Play Store Analytics</strong> &nbsp;·&nbsp;
+  Oasis Infobyte Data Analytics Internship &nbsp;·&nbsp; Level 2 – Task 4 &nbsp;·&nbsp;
+  Sentiment engine: {{ analysis.engine_used }}
+</footer>
+
+<!-- ── Plotly chart injection ──────────────── -->
+<script>
+  /* Inject Plotly charts from server-side JSON */
+  const pc = {{ analysis.plotly_charts | tojson | safe }};
+
+  function renderPlotly(divId, jsonStr) {
+    if (!jsonStr) return;
+    try {
+      const fig = JSON.parse(jsonStr);
+      Plotly.newPlot(divId, fig.data, fig.layout, { responsive: true });
+    } catch(e) { console.warn('Plotly render error:', e); }
+  }
+
+  renderPlotly('plot-bubble',   pc.bubble);
+  renderPlotly('plot-violin',   pc.violin);
+  renderPlotly('plot-installs', pc.installs);
+  renderPlotly('plot-sunburst', pc.sunburst);
+
+  /* Tab switching */
+  function showTab(name, btn) {
+    document.querySelectorAll('.plotly-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.ptab').forEach(b => b.classList.remove('active'));
+    document.getElementById('panel-' + name).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  /* Sidebar active-link highlight on scroll */
+  const sections = document.querySelectorAll('.section');
+  const links    = document.querySelectorAll('.sidebar-nav a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const active = document.querySelector(`.sidebar-nav a[href="#${e.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { threshold: 0.3 });
+  sections.forEach(s => observer.observe(s));
+</script>
+
+</body>
+</html>

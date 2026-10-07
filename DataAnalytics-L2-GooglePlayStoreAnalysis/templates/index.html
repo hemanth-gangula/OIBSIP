@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Google Play Store Analytics – Oasis Infobyte L2 T4</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>" />
+</head>
+<body>
+
+<!-- ── Navbar ──────────────────────────────── -->
+<nav class="navbar">
+  <div class="navbar-brand">
+    <div class="logo-icon">📊</div>
+    <span>Play Store Analytics</span>
+    <span class="navbar-badge">L2 · T4</span>
+  </div>
+  <div class="navbar-links">
+    <a href="https://oasisinfobyte.com" target="_blank">Oasis Infobyte</a>
+    <a href="https://github.com" target="_blank">GitHub</a>
+  </div>
+</nav>
+
+<!-- ── Hero ────────────────────────────────── -->
+<div class="hero fade-up">
+  <h1>Unveiling the Android App Market</h1>
+  <p>Google Play Store Analysis &nbsp;·&nbsp; Oasis Infobyte Data Analytics Internship</p>
+  <div class="badge-row">
+    <span class="badge">Level 2 – Task 4</span>
+    <span class="badge">Python · Flask · Pandas</span>
+    <span class="badge">TextBlob / VADER Sentiment</span>
+    <span class="badge">Plotly · Matplotlib · Seaborn</span>
+  </div>
+</div>
+
+{% if error %}
+<div class="upload-section">
+  <div class="status-msg error">⚠️ {{ error }}</div>
+</div>
+{% endif %}
+
+<!-- ── Upload Cards ─────────────────────────── -->
+<div class="upload-section">
+  <div class="upload-grid">
+
+    <!-- Apps Dataset -->
+    <div class="upload-card fade-up" id="card-apps">
+      <div class="upload-card-header">
+        <div class="upload-icon icon-apps">📱</div>
+        <div>
+          <h3>Apps Dataset</h3>
+          <p>Google Play Store Apps CSV / Excel</p>
+        </div>
+      </div>
+
+      <div class="drop-zone" id="dz-apps">
+        <input type="file" id="file-apps" accept=".csv,.xlsx,.xls" />
+        <div class="drop-zone-icon">📂</div>
+        <p><strong>Drag & drop</strong> or click to browse</p>
+        <div class="formats">
+          <span class="fmt-tag">CSV</span>
+          <span class="fmt-tag">XLSX</span>
+          <span class="fmt-tag">XLS</span>
+        </div>
+      </div>
+
+      <div id="status-apps"></div>
+
+      <div class="file-info" id="info-apps">
+        <div class="file-meta" id="meta-apps"></div>
+        <div style="margin-bottom:0.5rem;font-size:0.78rem;color:var(--text-muted);font-weight:700;letter-spacing:0.5px;text-transform:uppercase;">Columns</div>
+        <div class="col-tags" id="cols-apps"></div>
+        <div style="margin-bottom:0.5rem;font-size:0.78rem;color:var(--text-muted);font-weight:700;letter-spacing:0.5px;text-transform:uppercase;margin-top:0.75rem;">Preview (5 rows)</div>
+        <div class="preview-table-wrap">
+          <table class="preview-table" id="tbl-apps"></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reviews Dataset -->
+    <div class="upload-card fade-up" id="card-reviews">
+      <div class="upload-card-header">
+        <div class="upload-icon icon-reviews">💬</div>
+        <div>
+          <h3>User Reviews Dataset</h3>
+          <p>Google Play Store Reviews CSV / Excel</p>
+        </div>
+      </div>
+
+      <div class="drop-zone" id="dz-reviews">
+        <input type="file" id="file-reviews" accept=".csv,.xlsx,.xls" />
+        <div class="drop-zone-icon">📂</div>
+        <p><strong>Drag & drop</strong> or click to browse</p>
+        <div class="formats">
+          <span class="fmt-tag">CSV</span>
+          <span class="fmt-tag">XLSX</span>
+          <span class="fmt-tag">XLS</span>
+        </div>
+      </div>
+
+      <div id="status-reviews"></div>
+
+      <div class="file-info" id="info-reviews">
+        <div class="file-meta" id="meta-reviews"></div>
+        <div style="margin-bottom:0.5rem;font-size:0.78rem;color:var(--text-muted);font-weight:700;letter-spacing:0.5px;text-transform:uppercase;">Columns</div>
+        <div class="col-tags" id="cols-reviews"></div>
+        <div style="margin-bottom:0.5rem;font-size:0.78rem;color:var(--text-muted);font-weight:700;letter-spacing:0.5px;text-transform:uppercase;margin-top:0.75rem;">Preview (5 rows)</div>
+        <div class="preview-table-wrap">
+          <table class="preview-table" id="tbl-reviews"></table>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /.upload-grid -->
+</div>
+
+<!-- ── Analyse Section ─────────────────────── -->
+<div class="analyse-section">
+  <div class="analyse-card fade-up">
+    <h2>🚀 Ready to Analyse?</h2>
+    <p>Upload both datasets above, then click the button to run the full analysis.</p>
+
+    <div class="checklist">
+      <div class="check-item" id="chk-apps">
+        <div class="dot"></div> Apps Dataset Uploaded
+      </div>
+      <div class="check-item" id="chk-reviews">
+        <div class="dot"></div> Reviews Dataset Uploaded
+      </div>
+      <div class="check-item" id="chk-clean">
+        <div class="dot"></div> Data Cleaning
+      </div>
+      <div class="check-item" id="chk-cat">
+        <div class="dot"></div> Category Analysis
+      </div>
+      <div class="check-item" id="chk-rating">
+        <div class="dot"></div> Ratings Analysis
+      </div>
+      <div class="check-item" id="chk-size">
+        <div class="dot"></div> Size &amp; Installs
+      </div>
+      <div class="check-item" id="chk-price">
+        <div class="dot"></div> Pricing Analysis
+      </div>
+      <div class="check-item" id="chk-sent">
+        <div class="dot"></div> Sentiment Analysis
+      </div>
+      <div class="check-item" id="chk-sentcat">
+        <div class="dot"></div> Sentiment by Category
+      </div>
+      <div class="check-item" id="chk-plotly">
+        <div class="dot"></div> Interactive Plotly Charts
+      </div>
+      <div class="check-item" id="chk-insights">
+        <div class="dot"></div> Developer Insights
+      </div>
+    </div>
+
+    <button class="btn-analyse" id="btn-analyse" disabled onclick="runAnalysis()">
+      ⚡ Run Full Analysis
+    </button>
+
+    <div class="progress-wrap" id="progress-wrap">
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progress-fill"></div>
+      </div>
+      <div class="progress-label" id="progress-label">Initialising…</div>
+    </div>
+
+    <div id="analyse-error"></div>
+  </div>
+</div>
+
+<!-- ── Footer ──────────────────────────────── -->
+<footer class="footer">
+  <strong>Google Play Store Analytics</strong> &nbsp;·&nbsp;
+  Oasis Infobyte Data Analytics Internship &nbsp;·&nbsp; Level 2 – Task 4 &nbsp;·&nbsp;
+  Built with Python · Flask · Pandas · Plotly · TextBlob / VADER
+</footer>
+
+<script src="/static/js/upload.js"></script>
+</body>
+</html>
