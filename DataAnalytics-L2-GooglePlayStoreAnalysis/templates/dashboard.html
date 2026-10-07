@@ -4,8 +4,83 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard – Play Store Analytics</title>
-  <link rel="stylesheet" href="/static/css/style.css" />
   <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+  <style>
+:root{--bg:#0F0F1A;--card:#1A1A2E;--card2:#16213E;--border:#2A2A3E;--primary:#6C63FF;--secondary:#3ECFCF;--accent:#FF6584;--positive:#2ECC71;--negative:#E74C3C;--neutral:#F39C12;--text:#E0E0E0;--text-muted:#9A9AB0;--success:#27AE60;--error:#C0392B;--radius:12px;--shadow:0 4px 24px rgba(0,0,0,0.45);--transition:0.25s ease}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+a{color:var(--primary);text-decoration:none}a:hover{color:var(--secondary)}
+::-webkit-scrollbar{width:7px;height:7px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}::-webkit-scrollbar-thumb:hover{background:var(--primary)}
+.navbar{background:rgba(26,26,46,0.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 2rem;height:64px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:999}
+.navbar-brand{display:flex;align-items:center;gap:.75rem;font-size:1.15rem;font-weight:700;color:var(--text)}
+.navbar-brand .logo-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--primary),var(--secondary));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem}
+.navbar-badge{background:var(--primary);color:#fff;font-size:.65rem;font-weight:700;padding:2px 7px;border-radius:20px;letter-spacing:.5px}
+.navbar-links{display:flex;gap:.5rem}.navbar-links a{color:var(--text-muted);padding:6px 14px;border-radius:8px;font-size:.9rem;transition:var(--transition)}.navbar-links a:hover{background:var(--border);color:var(--text)}
+.dashboard-layout{display:flex;min-height:calc(100vh - 64px)}
+.sidebar{width:240px;flex-shrink:0;background:var(--card);border-right:1px solid var(--border);padding:1.5rem 0;position:sticky;top:64px;height:calc(100vh - 64px);overflow-y:auto}
+@media(max-width:900px){.sidebar{display:none}}
+.sidebar-title{color:var(--text-muted);font-size:.68rem;font-weight:700;letter-spacing:1.2px;padding:0 1.25rem;margin-bottom:.75rem;text-transform:uppercase}
+.sidebar-nav a{display:flex;align-items:center;gap:.65rem;padding:.6rem 1.25rem;color:var(--text-muted);font-size:.88rem;transition:var(--transition);border-left:3px solid transparent}
+.sidebar-nav a:hover,.sidebar-nav a.active{background:rgba(108,99,255,0.1);color:var(--text);border-left-color:var(--primary)}
+.main-content{flex:1;padding:2rem;overflow-x:hidden}
+@media(max-width:600px){.main-content{padding:1rem}}
+.section{margin-bottom:3rem;scroll-margin-top:80px}
+.section-header{display:flex;align-items:center;gap:.75rem;margin-bottom:1.5rem;padding-bottom:.75rem;border-bottom:1px solid var(--border)}
+.section-icon{width:38px;height:38px;border-radius:10px;background:rgba(108,99,255,0.18);color:var(--primary);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+.section-header h2{font-size:1.2rem;font-weight:700}.section-header p{font-size:.8rem;color:var(--text-muted)}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:1rem}
+.kpi-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem 1rem;text-align:center;transition:var(--transition)}
+.kpi-card:hover{border-color:var(--primary);transform:translateY(-2px)}
+.kpi-card .kpi-icon{font-size:1.6rem;margin-bottom:.5rem}
+.kpi-card .kpi-value{font-size:1.6rem;font-weight:800;background:linear-gradient(120deg,var(--primary),var(--secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.1}
+.kpi-card .kpi-label{font-size:.72rem;color:var(--text-muted);font-weight:600;letter-spacing:.4px;margin-top:.3rem;text-transform:uppercase}
+.chart-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;margin-bottom:1.25rem}
+.chart-card h3{font-size:.95rem;font-weight:700;margin-bottom:1rem;color:var(--text)}
+.chart-card img{width:100%;border-radius:8px;display:block}
+.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
+@media(max-width:860px){.charts-grid{grid-template-columns:1fr}}
+.quality-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
+@media(max-width:700px){.quality-grid{grid-template-columns:1fr}}
+.quality-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem}
+.quality-card h4{font-size:.9rem;font-weight:700;margin-bottom:.9rem}
+.quality-row{display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-bottom:1px solid var(--border);font-size:.83rem}
+.quality-row:last-child{border-bottom:none}.quality-row .qlabel{color:var(--text-muted)}.quality-row .qvalue{font-weight:700}
+.qvalue.good{color:var(--positive)}.qvalue.warn{color:var(--neutral)}.qvalue.bad{color:var(--negative)}
+.sentiment-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.25rem}
+@media(max-width:600px){.sentiment-cards{grid-template-columns:1fr}}
+.sentiment-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;text-align:center}
+.sentiment-card .sval{font-size:2rem;font-weight:800}
+.sentiment-card .slabel{font-size:.75rem;font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-top:.25rem}
+.sc-positive .sval{color:var(--positive)}.sc-negative .sval{color:var(--negative)}.sc-neutral .sval{color:var(--neutral)}
+.insight-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
+@media(max-width:700px){.insight-grid{grid-template-columns:1fr}}
+.insight-card{background:var(--card);border:1px solid var(--border);border-left:4px solid var(--primary);border-radius:var(--radius);padding:1.25rem;transition:var(--transition)}
+.insight-card:hover{border-left-color:var(--secondary);box-shadow:var(--shadow)}
+.insight-card h4{font-size:.95rem;font-weight:700;margin-bottom:.6rem}
+.insight-card p{font-size:.83rem;color:var(--text-muted);line-height:1.65}
+.insight-card p strong{color:var(--text)}
+.cat-table-wrap{overflow-x:auto}
+.cat-table{width:100%;border-collapse:collapse;font-size:.83rem}
+.cat-table th{background:var(--border);color:var(--text-muted);padding:8px 14px;text-align:left;font-weight:700;font-size:.73rem;letter-spacing:.5px;text-transform:uppercase}
+.cat-table td{padding:8px 14px;border-bottom:1px solid var(--border)}
+.cat-table tr:last-child td{border-bottom:none}.cat-table tr:hover td{background:rgba(108,99,255,0.07)}
+.rank-badge{background:rgba(108,99,255,0.2);color:var(--primary);font-weight:700;font-size:.72rem;padding:2px 8px;border-radius:4px}
+.plotly-tabs{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem}
+.ptab{background:var(--card2);border:1px solid var(--border);color:var(--text-muted);padding:6px 16px;border-radius:8px;font-size:.82rem;font-weight:600;cursor:pointer;transition:var(--transition)}
+.ptab:hover,.ptab.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.plotly-panel{display:none}.plotly-panel.active{display:block}
+.plotly-container{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;min-height:500px}
+.info-box{background:rgba(108,99,255,0.1);border:1px solid rgba(108,99,255,0.3);border-radius:10px;padding:1rem 1.25rem;font-size:.85rem;color:var(--text-muted);margin-top:.75rem}
+.info-box strong{color:var(--text)}
+.footer{border-top:1px solid var(--border);padding:1.5rem 2rem;text-align:center;color:var(--text-muted);font-size:.8rem}
+.footer strong{color:var(--primary)}
+.status-msg{display:flex;align-items:center;gap:.5rem;padding:.6rem 1rem;border-radius:8px;font-size:.85rem;font-weight:600;margin-top:.75rem}
+.status-msg.info{background:rgba(108,99,255,0.15);color:var(--primary);border:1px solid rgba(108,99,255,0.3)}
+.text-muted{color:var(--text-muted)}.mt-2{margin-top:1rem}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.fade-up{animation:fadeUp .4s ease forwards}
+  </style>
 </head>
 <body>
 
