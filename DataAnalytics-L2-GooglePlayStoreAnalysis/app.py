@@ -29,6 +29,9 @@ import data_processor as dp
 import sentiment_analyzer as sa
 import visualizations as viz
 
+# Chunk assembly storage: { upload_id: { 'chunks': {idx: bytes}, 'total': int, 'filename': str } }
+_chunks: dict = {}
+
 # ─────────────────────────────────────────────
 # APP CONFIG
 # ─────────────────────────────────────────────
@@ -287,6 +290,103 @@ def status():
 @app.route('/health')
 def health():
     return jsonify({'status': 'ok', 'service': 'Google Play Store Analytics'})
+
+
+# ── Chunked upload (for files > 4 MB on Vercel) ──────────
+# The JS client splits large files into ≤3.5 MB chunks and
+# POSTs each one separately. The server reassembles them in
+# /tmp, then loads the complete file into pandas.
+
+@app.route('/upload/chunk', methods=['POST'])
+def upload_chunk():
+    """Receive one chunk of a file upload (metadata via headers)."""
+    upload_id    = request.headers.get('X-Upload-Id')   or request.form.get('upload_id')
+    chunk_idx    = int(request.headers.get('X-Chunk-Index', request.form.get('chunk_idx', 0)))
+    total_chunks = int(request.headers.get('X-Total-Chunks', request.form.get('total_chunks', 1)))
+    filename     = request.headers.get('X-Filename')    or request.form.get('filename', 'upload')
+    kind         = request.headers.get('X-Kind')        or request.form.get('kind', 'apps')
+
+    if not upload_id:
+        return jsonify({'success': False, 'error': 'Missing upload_id'}), 400
+
+    chunk_data = request.get_data()
+    if not chunk_data:
+        return jsonify({'success': False, 'error': 'Empty chunk body'}), 400
+
+    _chunks.setdefault(upload_id, {'chunks': {}, 'total': total_chunks,
+                                    'filename': filename, 'kind': kind})
+    _chunks[upload_id]['chunks'][chunk_idx] = chunk_data
+
+    received = len(_chunks[upload_id]['chunks'])
+    return jsonify({'success': True, 'received': received, 'total': total_chunks})
+
+
+@app.route('/upload/chunk/finalise', methods=['POST'])
+def finalise_chunk_upload():
+    """Reassemble chunks and load the DataFrame."""
+    data      = request.get_json() or {}
+    upload_id = data.get('upload_id')
+    kind      = data.get('kind', 'apps')
+
+    if upload_id not in _chunks:
+        return jsonify({'success': False, 'error': 'Upload ID not found. Please re-upload.'}), 400
+
+    entry    = _chunks[upload_id]
+    total    = entry['total']
+    received = len(entry['chunks'])
+
+    if received < total:
+        return jsonify({'success': False,
+                        'error': f'Incomplete upload: {received}/{total} chunks received.'}), 400
+
+    # Reassemble in order
+    raw_bytes = b''.join(entry['chunks'][i] for i in range(total))
+    filename  = entry['filename']
+
+    import io
+    file_like = io.BytesIO(raw_bytes)
+    file_like.filename = filename  # needed by load_dataframe
+
+    # Monkey-patch: load_dataframe expects a file-storage-like object with .filename and .read()
+    class FakeFStorage:
+        def __init__(self, buf, name):
+            self._buf  = buf
+            self.filename = name
+        def read(self):
+            return self._buf.read()
+
+    fobj = FakeFStorage(file_like, filename)
+    df, err = dp.load_dataframe(fobj)
+    if err:
+        del _chunks[upload_id]
+        return jsonify({'success': False, 'error': err}), 400
+
+    if kind == 'apps':
+        valid, msg = dp.validate_apps_dataset(df)
+    else:
+        valid, msg = dp.validate_reviews_dataset(df)
+
+    if not valid:
+        del _chunks[upload_id]
+        return jsonify({'success': False, 'error': msg}), 400
+
+    sid = _sid()
+    _store.setdefault(sid, {})
+    _store[sid][f'{kind}_raw']    = df
+    _store[sid]['analysis_ready'] = False
+    del _chunks[upload_id]   # free memory
+
+    info = dp.get_dataset_info(df)
+    return jsonify({
+        'success':  True,
+        'message':  msg,
+        'filename': secure_filename(filename),
+        'filetype': filename.rsplit('.', 1)[-1].upper(),
+        'rows':     info['rows'],
+        'cols':     info['cols'],
+        'columns':  info['columns'],
+        'preview':  info['preview'],
+    })
 
 
 # ─────────────────────────────────────────────
