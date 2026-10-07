@@ -5,7 +5,8 @@
       "src": "app.py",
       "use": "@vercel/python",
       "config": {
-        "maxLambdaSize": "50mb"
+        "maxLambdaSize": "50mb",
+        "runtime": "python3.12"
       }
     }
   ],
@@ -22,11 +23,5 @@
   "env": {
     "PYTHONUNBUFFERED": "1",
     "MPLBACKEND": "Agg"
-  },
-  "functions": {
-    "app.py": {
-      "maxDuration": 60,
-      "memory": 1024
-    }
   }
 }
