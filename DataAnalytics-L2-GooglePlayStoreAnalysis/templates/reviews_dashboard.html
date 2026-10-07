@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reviews Dashboard | Google Play Store Analytics</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="{{ url_for('static', filename='js/plotly.min.js') }}"></script>
+</head>
+<body class="dashboard">
+
+  <!-- ── Header ─────────────────────────────────────────────── -->
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="header-logo">
+        <span class="logo-icon">▶</span>
+        <div>
+          <span class="logo-title">Google Play Store Analytics</span>
+          <span class="logo-sub">Oasis Infobyte · Data Analytics · Level 2 · Task 4</span>
+        </div>
+      </div>
+      <nav class="dash-nav">
+        <a href="{{ url_for('index') }}" class="dash-nav__link">← Home</a>
+        <span class="dash-nav__badge dash-nav__badge--purple">Reviews Dashboard</span>
+      </nav>
+    </div>
+  </header>
+
+  <main class="dash-main">
+
+    <!-- ── Page title ──────────────────────────────────────── -->
+    <div class="dash-page-header">
+      <div>
+        <h1 class="dash-page-title">💬 User Reviews Dashboard</h1>
+        <p class="dash-page-sub">
+          VADER NLP sentiment analysis on <code>googleplaystore_user_reviews.csv</code> —
+          all classifications computed live, fully interactive Plotly charts.
+        </p>
+      </div>
+      <a href="{{ url_for('index') }}" class="btn btn--outline btn--sm">Upload New File</a>
+    </div>
+
+    <!-- ── KPI cards ───────────────────────────────────────── -->
+    <section class="section">
+      <h2 class="section-title">Key Metrics</h2>
+      <div class="kpi-grid">
+        <div class="kpi-card kpi-card--blue">
+          <div class="kpi-card__icon">💬</div>
+          <div class="kpi-card__value">{{ kpis.total_reviews | int | format_number }}</div>
+          <div class="kpi-card__label">Reviews Analysed</div>
+        </div>
+        <div class="kpi-card kpi-card--green">
+          <div class="kpi-card__icon">😊</div>
+          <div class="kpi-card__value">{{ kpis.positive_pct }}%</div>
+          <div class="kpi-card__label">Positive ({{ kpis.positive_count | int | format_number }})</div>
+        </div>
+        <div class="kpi-card kpi-card--pink">
+          <div class="kpi-card__icon">😞</div>
+          <div class="kpi-card__value">{{ kpis.negative_pct }}%</div>
+          <div class="kpi-card__label">Negative ({{ kpis.negative_count | int | format_number }})</div>
+        </div>
+        <div class="kpi-card kpi-card--slate">
+          <div class="kpi-card__icon">😐</div>
+          <div class="kpi-card__value">{{ kpis.neutral_pct }}%</div>
+          <div class="kpi-card__label">Neutral ({{ kpis.neutral_count | int | format_number }})</div>
+        </div>
+        <div class="kpi-card kpi-card--yellow">
+          <div class="kpi-card__icon">📈</div>
+          <div class="kpi-card__value">{{ kpis.avg_compound }}</div>
+          <div class="kpi-card__label">Avg Compound Score</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Data Cleaning Summary ───────────────────────────── -->
+    <section class="section">
+      <h2 class="section-title">Data Cleaning Summary</h2>
+      <div class="info-grid">
+        <div class="info-card">
+          <div class="info-card__label">Original Reviews</div>
+          <div class="info-card__value">{{ clean_summary.original_rows | int | format_number }}</div>
+        </div>
+        <div class="info-card">
+          <div class="info-card__label">Duplicates Removed</div>
+          <div class="info-card__value text--warning">{{ clean_summary.duplicates_removed }}</div>
+        </div>
+        <div class="info-card">
+          <div class="info-card__label">Null Reviews Removed</div>
+          <div class="info-card__value text--warning">{{ clean_summary.null_reviews_removed }}</div>
+        </div>
+        <div class="info-card">
+          <div class="info-card__label">Final Reviews (cleaned)</div>
+          <div class="info-card__value text--success">{{ clean_summary.final_rows | int | format_number }}</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── VADER Methodology ────────────────────────────────── -->
+    <section class="section">
+      <div class="method-banner">
+        <div class="method-banner__icon">🔬</div>
+        <div>
+          <h3 class="method-banner__title">Sentiment Methodology — VADER NLP</h3>
+          <p class="method-banner__body">
+            Every review was classified fresh using
+            <strong>VADER (Valence Aware Dictionary and sEntiment Reasoner)</strong>,
+            a rule-based NLP model optimised for short-text sentiment.
+            Compound ≥ 0.05 → <span class="text--success">Positive</span> ·
+            ≤ −0.05 → <span class="text--danger">Negative</span> ·
+            between → <span class="text--muted">Neutral</span>.
+            The existing <code>Sentiment</code> column is used only as a validation reference.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 1. Sentiment Distribution (donut + bar) ──────────── -->
+    <section class="section">
+      <h2 class="section-title">Sentiment Distribution</h2>
+      <div class="chart-row">
+        <div class="chart-card chart-card--half chart-card--plotly">
+          <div id="chart-sent-donut" class="plotly-container plotly-container--sm"></div>
+        </div>
+        <div class="chart-card chart-card--half chart-card--plotly">
+          <div id="chart-sent-bar" class="plotly-container plotly-container--sm"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 2. Compound Score Distribution ──────────────────── -->
+    <section class="section">
+      <h2 class="section-title">VADER Compound Score Distribution</h2>
+      <p class="section-desc">
+        Compound score ranges from −1 (most negative) to +1 (most positive).
+        Dashed threshold lines mark the Positive (+0.05) and Negative (−0.05) boundaries.
+        Hover over any bar to see the exact count for that score range.
+      </p>
+      <div class="chart-card chart-card--plotly">
+        <div id="chart-compound" class="plotly-container"></div>
+      </div>
+    </section>
+
+    <!-- ── 3. Sentiment by Category ────────────────────────── -->
+    {% if cat_data %}
+    <section class="section">
+      <h2 class="section-title">Sentiment by Category</h2>
+      <p class="section-desc">
+        Reviews mapped to categories via the Apps dataset lookup.
+        <strong>{{ cat_data.mapped_reviews | int | format_number }}</strong> reviews matched ·
+        <strong>{{ cat_data.unmapped_reviews | int | format_number }}</strong> unmatched.
+        Most positive: <span class="tag tag--green">{{ cat_data.most_positive }}</span>
+        · Most negative: <span class="tag tag--red">{{ cat_data.most_negative }}</span>
+      </p>
+      <div class="chart-card chart-card--plotly">
+        <div id="chart-sent-by-cat" class="plotly-container"></div>
+      </div>
+    </section>
+    {% else %}
+    <section class="section">
+      <div class="empty-state">
+        <div class="empty-state__icon">🔗</div>
+        <h3 class="empty-state__title">Category Sentiment Not Available</h3>
+        <p class="empty-state__body">
+          The User Reviews dataset has no Category column. Upload the
+          <strong>Apps dataset first</strong> — the app maps reviews to categories
+          using the App → Category lookup from that dataset.
+        </p>
+        <a href="{{ url_for('index') }}" class="btn btn--primary btn--sm">Upload Apps Dataset</a>
+      </div>
+    </section>
+    {% endif %}
+
+    <!-- ── VADER vs Original validation ────────────────────── -->
+    {% if validation_comparison %}
+    <section class="section">
+      <h2 class="section-title">VADER vs. Original Label Comparison</h2>
+      <div class="validation-banner">
+        <div class="validation-banner__stat">
+          <span class="validation-banner__pct">{{ validation_comparison.agreement_pct }}%</span>
+          <span class="validation-banner__label">Agreement with original Sentiment column</span>
+        </div>
+        <p class="validation-banner__note">{{ validation_comparison.note }}</p>
+      </div>
+    </section>
+    {% endif %}
+
+    <!-- ── Sentiment Insights ───────────────────────────────── -->
+    <section class="section">
+      <h2 class="section-title">Sentiment Insights</h2>
+      <div class="insights-grid">
+        {% for insight in s_insights %}
+        <div class="insight-card">
+          <div class="insight-card__icon">{{ insight.icon }}</div>
+          <h3 class="insight-card__title">{{ insight.title }}</h3>
+          <p class="insight-card__body">{{ insight.body }}</p>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <p>Oasis Infobyte · Data Analytics Internship · Level 2 · Task 4 · Google Play Store Analysis</p>
+  </footer>
+
+  <!-- ── Plotly renders ──────────────────────────────────────── -->
+  <script>
+    var _cfg = { responsive: true, displayModeBar: true, displaylogo: false,
+                 modeBarButtonsToRemove: ['toImage'] };
+
+    function _plot(id, fig) {
+      try {
+        Plotly.newPlot(id, fig.data, fig.layout, _cfg);
+      } catch(e) {
+        document.getElementById(id).innerHTML =
+          '<p class="chart-error">Chart could not be rendered: ' + e.message + '</p>';
+      }
+    }
+
+    _plot('chart-sent-donut', {{ p_sent_donut | safe }});
+    _plot('chart-sent-bar',   {{ p_sent_bar   | safe }});
+    _plot('chart-compound',   {{ p_compound   | safe }});
+
+    {% if cat_data and p_sent_by_cat %}
+    _plot('chart-sent-by-cat', {{ p_sent_by_cat | safe }});
+    {% endif %}
+  </script>
+</body>
+</html>

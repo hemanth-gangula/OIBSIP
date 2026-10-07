@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Google Play Store Analytics | Oasis Infobyte</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+</head>
+<body class="landing">
+
+  <!-- ── Header ─────────────────────────────────────────────────── -->
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="header-logo">
+        <span class="logo-icon">▶</span>
+        <div>
+          <span class="logo-title">Google Play Store Analytics</span>
+          <span class="logo-sub">Oasis Infobyte · Data Analytics · Level 2 · Task 4</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── Hero ───────────────────────────────────────────────────── -->
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-badge">Internship Project</div>
+      <h1 class="hero-title">Unveiling the Android App Market</h1>
+      <p class="hero-sub">
+        Upload the two official Kaggle datasets to explore category trends, rating
+        distributions, pricing analysis, and VADER-powered sentiment insights — all
+        computed live from your data.
+      </p>
+      <div class="hero-chips">
+        <span class="chip">pandas</span>
+        <span class="chip">numpy</span>
+        <span class="chip">seaborn</span>
+        <span class="chip">VADER NLP</span>
+        <span class="chip">Plotly</span>
+        <span class="chip">Flask</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Flash messages ────────────────────────────────────────── -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-container">
+        {% for category, message in messages %}
+          <div class="flash flash--{{ category }}">
+            <span class="flash-icon">{{ '✗' if category == 'error' else 'ℹ' }}</span>
+            <span>{{ message }}</span>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <!-- ── Upload cards ──────────────────────────────────────────── -->
+  <main class="upload-grid">
+
+    <!-- Card 1: Apps Dataset -->
+    <div class="upload-card" id="card-apps">
+      <div class="upload-card__header">
+        <div class="upload-card__icon upload-card__icon--blue">📊</div>
+        <div>
+          <h2 class="upload-card__title">Apps Dataset</h2>
+          <p class="upload-card__label">Upload 1 of 2</p>
+        </div>
+      </div>
+      <p class="upload-card__desc">
+        Upload the <strong>Google Play Store Apps</strong> dataset
+        (<code>googleplaystore.csv</code>) to analyse categories, ratings,
+        pricing, size vs installs, and developer insights.
+      </p>
+      <ul class="upload-card__checklist">
+        <li>✔ Category distribution</li>
+        <li>✔ Rating analysis</li>
+        <li>✔ Size vs Installs correlation</li>
+        <li>✔ Free vs Paid pricing</li>
+        <li>✔ Revenue estimation</li>
+        <li>✔ Interactive Plotly chart</li>
+      </ul>
+
+      <form action="/upload-apps" method="POST" enctype="multipart/form-data"
+            class="upload-form" id="form-apps">
+        <label class="drop-zone" id="drop-apps" for="apps_file">
+          <div class="drop-zone__icon">☁</div>
+          <div class="drop-zone__text" id="drop-apps-text">
+            Drag &amp; drop or <span class="drop-zone__link">browse</span>
+          </div>
+          <div class="drop-zone__hint">CSV or XLSX · Max 50 MB</div>
+          <input type="file" name="apps_file" id="apps_file"
+                 accept=".csv,.xlsx,.xls" class="drop-zone__input" />
+        </label>
+
+        <div class="file-preview" id="preview-apps" hidden>
+          <span class="file-preview__icon">📄</span>
+          <span class="file-preview__name" id="preview-apps-name"></span>
+          <button type="button" class="file-preview__remove"
+                  onclick="clearFile('apps')">✕</button>
+        </div>
+
+        <button type="submit" class="btn btn--primary btn--full" id="btn-apps" disabled>
+          <span class="btn-text">Analyse Apps Dataset →</span>
+          <span class="btn-spinner" hidden>⏳ Analysing…</span>
+        </button>
+      </form>
+    </div>
+
+    <!-- Card 2: Reviews Dataset -->
+    <div class="upload-card" id="card-reviews">
+      <div class="upload-card__header">
+        <div class="upload-card__icon upload-card__icon--purple">💬</div>
+        <div>
+          <h2 class="upload-card__title">User Reviews Dataset</h2>
+          <p class="upload-card__label">Upload 2 of 2</p>
+        </div>
+      </div>
+      <p class="upload-card__desc">
+        Upload the <strong>Google Play Store User Reviews</strong> dataset
+        (<code>googleplaystore_user_reviews.csv</code>) for VADER sentiment
+        classification and per-category sentiment insights.
+      </p>
+      <ul class="upload-card__checklist">
+        <li>✔ VADER NLP sentiment classification</li>
+        <li>✔ Positive / Negative / Neutral breakdown</li>
+        <li>✔ Compound score distribution</li>
+        <li>✔ Sentiment by category (when Apps also uploaded)</li>
+        <li>✔ Interactive Plotly chart</li>
+      </ul>
+
+      <form action="/upload-reviews" method="POST" enctype="multipart/form-data"
+            class="upload-form" id="form-reviews">
+        <label class="drop-zone" id="drop-reviews" for="reviews_file">
+          <div class="drop-zone__icon">☁</div>
+          <div class="drop-zone__text" id="drop-reviews-text">
+            Drag &amp; drop or <span class="drop-zone__link">browse</span>
+          </div>
+          <div class="drop-zone__hint">CSV or XLSX · Max 50 MB</div>
+          <input type="file" name="reviews_file" id="reviews_file"
+                 accept=".csv,.xlsx,.xls" class="drop-zone__input" />
+        </label>
+
+        <div class="file-preview" id="preview-reviews" hidden>
+          <span class="file-preview__icon">📄</span>
+          <span class="file-preview__name" id="preview-reviews-name"></span>
+          <button type="button" class="file-preview__remove"
+                  onclick="clearFile('reviews')">✕</button>
+        </div>
+
+        <button type="submit" class="btn btn--secondary btn--full" id="btn-reviews" disabled>
+          <span class="btn-text">Analyse Reviews Dataset →</span>
+          <span class="btn-spinner" hidden>⏳ Analysing…</span>
+        </button>
+      </form>
+    </div>
+
+  </main>
+
+  <!-- ── Dataset source info ───────────────────────────────────── -->
+  <section class="source-info">
+    <h3 class="source-info__title">Dataset Source</h3>
+    <p class="source-info__body">
+      Both datasets are publicly available on Kaggle. Raw data files are <strong>not</strong>
+      included in the repository and must be downloaded separately.
+    </p>
+    <div class="source-links">
+      <a href="https://www.kaggle.com/datasets/lava18/google-play-store-apps"
+         target="_blank" rel="noopener" class="source-link">
+        📦 Google Play Store Apps Dataset
+      </a>
+      <a href="https://www.kaggle.com/datasets/lava18/google-play-store-apps"
+         target="_blank" rel="noopener" class="source-link">
+        💬 User Reviews Dataset
+      </a>
+    </div>
+  </section>
+
+  <!-- ── Footer ────────────────────────────────────────────────── -->
+  <footer class="site-footer">
+    <p>Oasis Infobyte · Data Analytics Internship · Level 2 · Task 4 · Google Play Store Analysis</p>
+  </footer>
+
+  <script src="{{ url_for('static', filename='js/upload.js') }}"></script>
+</body>
+</html>
