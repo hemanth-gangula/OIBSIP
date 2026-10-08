@@ -13,7 +13,13 @@ import plotly.graph_objects as go
 import plotly.express as px
 from plotly.utils import PlotlyJSONEncoder
 
-# matplotlib / seaborn retained for Jupyter Notebook — NOT used by Flask routes
+# matplotlib / seaborn retained for Jupyter Notebook — NOT used by Flask routes.
+# On Vercel the default matplotlib config dir (~/.config/matplotlib) is read-only.
+# Redirect it to /tmp before importing matplotlib so cache writes succeed.
+import os as _os
+import tempfile as _tempfile
+_os.environ.setdefault("MPLCONFIGDIR", _tempfile.gettempdir())
+
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt

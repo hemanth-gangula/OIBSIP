@@ -11,21 +11,28 @@ Two separate upload flows:
 
 All dashboard charts are served as Plotly JSON (fully interactive).
 matplotlib/seaborn are retained in visualizations.py for Jupyter Notebook use only.
+
+Vercel compatibility
+--------------------
+Vercel's Lambda filesystem is read-only except for /tmp.
+This app avoids ALL disk I/O during requests by reading uploaded files
+directly from the in-memory FileStorage stream into pandas DataFrames.
+No file is ever written to disk, so no upload directory is needed.
 """
 
 import os
+import io
 from pathlib import Path
 
 from flask import (
     Flask, render_template, request, redirect,
     url_for, flash,
 )
-from werkzeug.utils import secure_filename
+from werkzeug.utils import secure_filename  # kept for safety; no longer used for disk writes
 
 import pandas as pd
 
 from data_processor import (
-    load_file,
     validate_apps_dataset,
     validate_reviews_dataset,
     clean_apps_dataset,
@@ -63,15 +70,16 @@ from visualizations import (
 # ---------------------------------------------------------------------------
 
 BASE_DIR = Path(__file__).parent
-UPLOAD_FOLDER = BASE_DIR / "uploads"
-UPLOAD_FOLDER.mkdir(exist_ok=True)
 
+# Vercel's Lambda filesystem is read-only at /var/task.
+# We never write uploads to disk — files are read directly into memory.
+# The uploads/ directory is only needed for local development convenience;
+# we skip mkdir entirely so the import never touches the filesystem.
 ALLOWED_EXTENSIONS = {"csv", "xlsx", "xls"}
 MAX_CONTENT_MB = 50
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "gplay-oasis-analytics-2024-task4")
-app.config["UPLOAD_FOLDER"] = str(UPLOAD_FOLDER)
 app.config["MAX_CONTENT_LENGTH"] = MAX_CONTENT_MB * 1024 * 1024
 
 
@@ -95,10 +103,19 @@ def _allowed(filename: str) -> bool:
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-def _save(file_storage) -> str:
-    dest = UPLOAD_FOLDER / secure_filename(file_storage.filename)
-    file_storage.save(str(dest))
-    return str(dest)
+def _read_df(file_storage) -> pd.DataFrame:
+    """
+    Read an uploaded FileStorage object directly into a DataFrame — no disk I/O.
+    Works identically on local development and Vercel serverless.
+    Supports CSV and Excel formats.
+    """
+    filename = file_storage.filename or ""
+    ext = filename.rsplit(".", 1)[-1].lower() if "." in filename else ""
+    data = io.BytesIO(file_storage.read())
+    if ext in ("xlsx", "xls"):
+        return pd.read_excel(data)
+    # Default: CSV
+    return pd.read_csv(data, on_bad_lines="skip")
 
 
 def _err(msg: str):
@@ -128,12 +145,7 @@ def upload_apps():
         return _err("Unsupported file type. Please upload a CSV or Excel file.")
 
     try:
-        path = _save(f)
-    except Exception as e:
-        return _err(f"Upload failed: {e}")
-
-    try:
-        df_raw = load_file(path)
+        df_raw = _read_df(f)
     except Exception as e:
         return _err(f"Could not read file: {e}")
 
@@ -218,12 +230,7 @@ def upload_reviews():
         return _err("Unsupported file type. Please upload a CSV or Excel file.")
 
     try:
-        path = _save(f)
-    except Exception as e:
-        return _err(f"Upload failed: {e}")
-
-    try:
-        df_raw = load_file(path)
+        df_raw = _read_df(f)
     except Exception as e:
         return _err(f"Could not read file: {e}")
 
