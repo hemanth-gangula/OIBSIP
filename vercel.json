@@ -1,23 +1,7 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "DataAnalytics-L2-GooglePlayStoreAnalysis/app.py",
-      "use": "@vercel/python",
-      "config": {
-        "maxLambdaSize": "50mb"
-      }
-    }
-  ],
-  "routes": [
-    {
-      "src": "/static/(.*)",
-      "dest": "DataAnalytics-L2-GooglePlayStoreAnalysis/static/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "DataAnalytics-L2-GooglePlayStoreAnalysis/app.py"
-    }
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/api/index" }
   ],
   "env": {
     "FLASK_ENV": "production",
