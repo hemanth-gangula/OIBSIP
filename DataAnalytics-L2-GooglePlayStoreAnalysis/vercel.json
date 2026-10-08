@@ -16,10 +16,11 @@
     },
     {
       "src": "/(.*)",
-      "dest": "/app.py"
+      "dest": "app.py"
     }
   ],
   "env": {
-    "FLASK_ENV": "production"
+    "FLASK_ENV": "production",
+    "MPLCONFIGDIR": "/tmp"
   }
 }
