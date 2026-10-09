@@ -1,0 +1,224 @@
+{% extends 'base.html' %}
+
+{% block title %}Model Comparison — AutoNLP{% endblock %}
+
+{% block content %}
+<div class="container">
+  <header class="page-header" aria-labelledby="page-title">
+    <h1 class="page-header__title" id="page-title">NLP Models</h1>
+    <p class="page-header__subtitle">
+      How each language model and spelling corrector works — their mechanisms,
+      strengths, limitations, and evaluation results.
+    </p>
+  </header>
+
+  <!-- ===== IMPORTANT disclaimer ===== -->
+  <div class="disclaimer-banner" role="note" aria-label="Model type disclaimer">
+    <span class="disclaimer-banner__icon" aria-hidden="true">⚠️</span>
+    <p class="disclaimer-banner__text">
+      <strong>These are statistical language models and algorithmic spelling correctors — NOT neural networks or trained ML classifiers.</strong>
+      They use frequency counts and edit distances computed from a text corpus; no gradient-based training occurs.
+    </p>
+  </div>
+
+  <!-- ===== Language models ===== -->
+  <section aria-labelledby="lm-heading">
+    <h2 class="section__title" id="lm-heading">Language Models (Autocomplete)</h2>
+    <div class="model-cards">
+
+      <article class="card model-card" aria-labelledby="bigram-heading">
+        <div class="model-card__header">
+          <span class="badge badge--blue model-card__badge">Bigram</span>
+          <h3 class="model-card__title" id="bigram-heading">BigramModel</h3>
+        </div>
+        <dl class="model-card__details">
+          <dt>Purpose</dt>
+          <dd>Predict the next word given the single preceding word.</dd>
+          <dt>How it works</dt>
+          <dd>
+            Counts all consecutive word pairs (bigrams) in the corpus. For a given word&nbsp;<em>w</em>,
+            it looks up all words that followed&nbsp;<em>w</em> in training text and ranks them by
+            Maximum Likelihood Estimate (MLE) probability:
+            <code>P(w₂|w₁) = count(w₁,w₂) / count(w₁)</code>.
+          </dd>
+          <dt>Strengths</dt>
+          <dd>Fast, memory-efficient, simple to interpret, no training step required.</dd>
+          <dt>Limitations</dt>
+          <dd>Uses only one word of context; misses longer dependencies; data-sparse for rare words.</dd>
+          <dt>Evaluation metric</dt>
+          <dd>Top-1 accuracy, Top-3 accuracy, Mean Reciprocal Rank (MRR).</dd>
+        </dl>
+        <div class="model-card__metric">
+          <span class="metric-pill">Top-1: <strong>30.5 %</strong></span>
+          <span class="metric-pill">Top-3: <strong>57.0 %</strong></span>
+          <span class="metric-pill">MRR: <strong>0.422</strong></span>
+        </div>
+      </article>
+
+      <article class="card model-card" aria-labelledby="trigram-heading">
+        <div class="model-card__header">
+          <span class="badge badge--teal model-card__badge">Trigram</span>
+          <h3 class="model-card__title" id="trigram-heading">TrigramModel</h3>
+        </div>
+        <dl class="model-card__details">
+          <dt>Purpose</dt>
+          <dd>Predict the next word given the two preceding words.</dd>
+          <dt>How it works</dt>
+          <dd>
+            Counts all consecutive word triples (trigrams). Given context&nbsp;<em>(w₁, w₂)</em>,
+            ranks candidates by <code>P(w₃|w₁,w₂) = count(w₁,w₂,w₃) / count(w₁,w₂)</code>.
+            Falls back to bigram predictions when the trigram context hasn't been seen.
+          </dd>
+          <dt>Strengths</dt>
+          <dd>Captures richer context than bigrams; significantly higher accuracy on common phrases.</dd>
+          <dt>Limitations</dt>
+          <dd>Data-sparse for rare word pairs; larger memory footprint; no smoothing implemented.</dd>
+          <dt>Evaluation metric</dt>
+          <dd>Top-1 accuracy, Top-3 accuracy, Mean Reciprocal Rank (MRR).</dd>
+        </dl>
+        <div class="model-card__metric">
+          <span class="metric-pill">Top-1: <strong>65.0 %</strong></span>
+          <span class="metric-pill">Top-3: <strong>80.0 %</strong></span>
+          <span class="metric-pill">MRR: <strong>0.720</strong></span>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- ===== Spelling correctors ===== -->
+  <section aria-labelledby="corr-heading">
+    <h2 class="section__title" id="corr-heading">Spelling Correctors (Autocorrect)</h2>
+    <div class="model-cards">
+
+      <article class="card model-card" aria-labelledby="ed-heading">
+        <div class="model-card__header">
+          <span class="badge badge--blue model-card__badge">Edit Distance</span>
+          <h3 class="model-card__title" id="ed-heading">EditDistanceCorrector</h3>
+        </div>
+        <dl class="model-card__details">
+          <dt>Purpose</dt>
+          <dd>Find real dictionary words that are closest to the misspelled input.</dd>
+          <dt>How it works</dt>
+          <dd>
+            Generates all words within edit-distance 1 (single insertion, deletion, substitution,
+            or transposition) and edit-distance 2 of the input word. Filters these against the
+            known vocabulary, then ranks survivors first by edit distance (smaller = better)
+            and second by corpus frequency (higher = better). This is a deterministic algorithm —
+            no probabilities involved.
+          </dd>
+          <dt>Strengths</dt>
+          <dd>Transparent, interpretable, no ambiguity in ranking logic.</dd>
+          <dt>Limitations</dt>
+          <dd>
+            Computationally expensive for edit-distance 2; ignores word-frequency weighting
+            at the primary rank; can suggest equally-distant but unlikely words.
+          </dd>
+          <dt>Evaluation metric</dt>
+          <dd>Top-1 accuracy and Top-3 accuracy on 50 misspelled/correct word pairs.</dd>
+        </dl>
+        <div class="model-card__metric">
+          <span class="metric-pill">Top-1: <strong>48.0 %</strong></span>
+          <span class="metric-pill">Top-3: <strong>58.0 %</strong></span>
+          <span class="metric-pill">n = 50 pairs</span>
+        </div>
+      </article>
+
+      <article class="card model-card" aria-labelledby="prob-heading">
+        <div class="model-card__header">
+          <span class="badge badge--teal model-card__badge">Probabilistic</span>
+          <h3 class="model-card__title" id="prob-heading">ProbabilisticCorrector</h3>
+        </div>
+        <dl class="model-card__details">
+          <dt>Purpose</dt>
+          <dd>Rank candidate corrections by corpus frequency, favouring the most common real word.</dd>
+          <dt>How it works</dt>
+          <dd>
+            Implements Norvig's spell corrector: generates edit-1 and edit-2 candidates, filters
+            to known vocabulary, and scores each by its unigram probability
+            <code>P(w) = count(w) / total_tokens</code>.
+            Edit-1 candidates are always preferred over edit-2 candidates. This uses the same
+            edit-generation logic as EditDistanceCorrector but ranks primarily by frequency.
+          </dd>
+          <dt>Strengths</dt>
+          <dd>More likely to surface common words; better for frequent misspelling patterns.</dd>
+          <dt>Limitations</dt>
+          <dd>
+            Can over-correct to high-frequency words even when a lower-frequency word is
+            the obvious correction. No context from surrounding words.
+          </dd>
+          <dt>Evaluation metric</dt>
+          <dd>Top-1 accuracy and Top-3 accuracy on 50 misspelled/correct word pairs.</dd>
+        </dl>
+        <div class="model-card__metric">
+          <span class="metric-pill">Top-1: <strong>48.0 %</strong></span>
+          <span class="metric-pill">Top-3: <strong>58.0 %</strong></span>
+          <span class="metric-pill">n = 50 pairs</span>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- ===== Comparison table ===== -->
+  <section aria-labelledby="comparison-heading">
+    <h2 class="section__title" id="comparison-heading">Model Comparison</h2>
+    <p class="section__note">
+      Baseline results previously reported. See the
+      <a href="/about">About page</a> for evaluation methodology details.
+    </p>
+    <div class="table-wrapper" role="region" aria-label="Model comparison table" tabindex="0">
+      <table class="results-table" aria-describedby="comparison-caption">
+        <caption id="comparison-caption" class="visually-hidden">
+          Comparison of all four NLP models by type, accuracy, and notes
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col">Model</th>
+            <th scope="col">Type</th>
+            <th scope="col">Top-1 Acc.</th>
+            <th scope="col">Top-3 Acc.</th>
+            <th scope="col">MRR</th>
+            <th scope="col">Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="badge badge--blue">Bigram</span></td>
+            <td>Statistical LM</td>
+            <td>30.5 %</td>
+            <td>57.0 %</td>
+            <td>0.422</td>
+            <td>1-word context; MLE</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge--teal">Trigram</span></td>
+            <td>Statistical LM</td>
+            <td>65.0 %</td>
+            <td>80.0 %</td>
+            <td>0.720</td>
+            <td>2-word context; bigram fallback</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge--blue">Edit Distance</span></td>
+            <td>Algorithmic</td>
+            <td>48.0 %</td>
+            <td>58.0 %</td>
+            <td>—</td>
+            <td>Levenshtein; rank by dist then freq</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge--teal">Probabilistic</span></td>
+            <td>Algorithmic</td>
+            <td>48.0 %</td>
+            <td>58.0 %</td>
+            <td>—</td>
+            <td>Norvig P(w); edit-1 before edit-2</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</div><!-- /container -->
+{% endblock %}

@@ -1,0 +1,17 @@
+__pycache__/
+*.pyc
+*.pyo
+.ipynb_checkpoints/
+*.egg-info/
+.env
+.venv/
+venv/
+dist/
+build/
+*.egg
+.DS_Store
+outputs/figures/*.png
+data/processed/*
+!data/processed/spell_pairs.json
+!data/processed/model_data.json
+.agents/

@@ -1,0 +1,73 @@
+context,model,rank,predicted_word,score
+the,bigram,1,same,0.011979
+the,bigram,2,first,0.007869
+the,bigram,3,emperor,0.007236
+the,trigram,1,same,0.011979
+the,trigram,2,first,0.007869
+the,trigram,3,emperor,0.007236
+it was,bigram,1,a,0.057286
+it was,bigram,2,the,0.050825
+it was,bigram,3,not,0.039541
+it was,trigram,1,a,0.080427
+it was,trigram,2,not,0.069751
+it was,trigram,3,the,0.053381
+in the,bigram,1,same,0.011979
+in the,bigram,2,first,0.007869
+in the,bigram,3,emperor,0.007236
+in the,trigram,1,same,0.022186
+in the,trigram,2,case,0.012379
+in the,trigram,3,middle,0.011897
+he said,bigram,1,the,0.129795
+he said,bigram,2,he,0.117967
+he said,bigram,3,to,0.051471
+he said,trigram,1,to,0.116883
+he said,trigram,2,that,0.057143
+he said,trigram,3,in,0.049351
+machine learning,bigram,1,and,0.192308
+machine learning,bigram,2,that,0.115385
+machine learning,bigram,3,the,0.076923
+machine learning,trigram,1,and,0.192308
+machine learning,trigram,2,that,0.115385
+machine learning,trigram,3,the,0.076923
+she looked,bigram,1,at,0.341499
+she looked,bigram,2,round,0.074928
+she looked,bigram,3,upon,0.056196
+she looked,trigram,1,at,0.46875
+she looked,trigram,2,straight,0.09375
+she looked,trigram,3,up,0.0625
+a great,bigram,1,britain,0.091521
+a great,bigram,2,and,0.025572
+a great,bigram,3,toe,0.02288
+a great,trigram,1,deal,0.110236
+a great,trigram,2,many,0.047244
+a great,trigram,3,man,0.03937
+at the,bigram,1,same,0.011979
+at the,bigram,2,first,0.007869
+at the,bigram,3,emperor,0.007236
+at the,trigram,1,same,0.072054
+at the,trigram,2,end,0.03088
+at the,trigram,3,time,0.027792
+one of,bigram,1,the,0.317599
+one of,bigram,2,a,0.043516
+one of,bigram,3,his,0.025866
+one of,trigram,1,the,0.559429
+one of,trigram,2,them,0.096672
+one of,trigram,3,those,0.064976
+the man,bigram,1,who,0.098097
+the man,bigram,2,s,0.058565
+the man,bigram,3,of,0.057833
+the man,trigram,1,who,0.2
+the man,trigram,2,s,0.086667
+the man,trigram,3,of,0.066667
+for the,bigram,1,same,0.011979
+for the,bigram,2,first,0.007869
+for the,bigram,3,emperor,0.007236
+for the,trigram,1,first,0.06759
+for the,trigram,2,most,0.019544
+for the,trigram,3,purpose,0.017915
+with a,bigram,1,few,0.018096
+with a,bigram,2,man,0.016605
+with a,bigram,3,long,0.012184
+with a,trigram,1,smile,0.062156
+with a,trigram,2,sigh,0.017309
+with a,trigram,3,slight,0.012589

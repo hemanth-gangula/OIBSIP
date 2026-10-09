@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+
+{% block title %}Autocomplete &amp; Autocorrect — Text Data Analytics &amp; NLP{% endblock %}
+
+{% block content %}
+<!-- ===== Hero ===== -->
+<section class="hero" aria-labelledby="hero-heading">
+  <div class="container">
+    <div class="hero__content">
+      <div class="hero__badge">Data Analytics · NLP · Portfolio</div>
+      <h1 class="hero__title" id="hero-heading">
+        Autocomplete &amp; Autocorrect:<br />
+        <span class="hero__title-accent">Text Data Analytics</span>
+      </h1>
+      <p class="hero__subtitle">
+        An end-to-end NLP project demonstrating statistical language models, corpus analytics,
+        and interactive spell-correction — built with Python, Flask, and Plotly.
+      </p>
+      <div class="hero__cta">
+        <a class="btn btn--primary" href="/autocomplete">Try Autocomplete</a>
+        <a class="btn btn--secondary" href="/autocorrect">Try Autocorrect</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Feature cards ===== -->
+<section class="section" aria-labelledby="features-heading">
+  <div class="container">
+    <h2 class="section__title" id="features-heading">Explore the Project</h2>
+    <div class="cards-grid">
+
+      <a class="card card--link" href="/autocomplete" aria-label="Autocomplete Playground">
+        <div class="card__icon" aria-hidden="true">🔮</div>
+        <h3 class="card__title">Autocomplete Playground</h3>
+        <p class="card__text">
+          Enter any text fragment and get next-word predictions from Bigram and Trigram
+          statistical language models trained on Peter Norvig's corpus.
+        </p>
+        <span class="card__cta">Try it →</span>
+      </a>
+
+      <a class="card card--link" href="/autocorrect" aria-label="Autocorrect Playground">
+        <div class="card__icon" aria-hidden="true">✏️</div>
+        <h3 class="card__title">Autocorrect Playground</h3>
+        <p class="card__text">
+          Test spell correction using Edit Distance and Probabilistic correction algorithms.
+          Compare both approaches side-by-side on any word.
+        </p>
+        <span class="card__cta">Try it →</span>
+      </a>
+
+      <a class="card card--link" href="/analytics" aria-label="Analytics Dashboard">
+        <div class="card__icon" aria-hidden="true">📊</div>
+        <h3 class="card__title">Analytics Dashboard</h3>
+        <p class="card__text">
+          Interactive Plotly visualizations of word frequencies, vocabulary statistics,
+          and model performance comparisons from the actual corpus data.
+        </p>
+        <span class="card__cta">Explore →</span>
+      </a>
+
+      <a class="card card--link" href="/models" aria-label="Model Comparison">
+        <div class="card__icon" aria-hidden="true">🧠</div>
+        <h3 class="card__title">Model Comparison</h3>
+        <p class="card__text">
+          Deep-dive into how each NLP model works — Bigram, Trigram, Edit Distance corrector,
+          and Probabilistic corrector — with accuracy benchmarks and a comparison table.
+        </p>
+        <span class="card__cta">Learn more →</span>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- ===== Baseline results ===== -->
+<section class="section section--alt" aria-labelledby="results-heading">
+  <div class="container">
+    <h2 class="section__title" id="results-heading">Evaluation Results</h2>
+    <p class="section__note">
+      <strong>Previously Reported Baseline Results — not independently re-verified during this deployment.</strong>
+      These metrics were produced by running the evaluation suite on the held-out test sets
+      described in the project notebook.
+    </p>
+    <div class="table-wrapper" role="region" aria-label="Baseline evaluation results" tabindex="0">
+      <table class="results-table" aria-describedby="results-caption">
+        <caption id="results-caption" class="visually-hidden">
+          Previously reported baseline evaluation results for autocomplete and autocorrect models
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col">Model</th>
+            <th scope="col">Task</th>
+            <th scope="col">Top-1 Accuracy</th>
+            <th scope="col">Top-3 Accuracy</th>
+            <th scope="col">MRR</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="badge badge--blue">Bigram</span></td>
+            <td>Autocomplete</td>
+            <td>30.5 %</td>
+            <td>57.0 %</td>
+            <td>0.422</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge--teal">Trigram</span></td>
+            <td>Autocomplete</td>
+            <td>65.0 %</td>
+            <td>80.0 %</td>
+            <td>0.720</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge--blue">Edit Distance</span></td>
+            <td>Autocorrect</td>
+            <td>48.0 %</td>
+            <td>58.0 %</td>
+            <td>—</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge--teal">Probabilistic</span></td>
+            <td>Autocorrect</td>
+            <td>48.0 %</td>
+            <td>58.0 %</td>
+            <td>—</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="results-meta">Tested on 50 misspelled word pairs. Autocomplete evaluated on held-out trigram contexts.</p>
+  </div>
+</section>
+
+<!-- ===== Tech stack ===== -->
+<section class="section" aria-labelledby="tech-heading">
+  <div class="container">
+    <h2 class="section__title" id="tech-heading">Technologies</h2>
+    <div class="tech-badges" role="list" aria-label="Technologies used">
+      <span class="tech-badge" role="listitem">Python 3.12</span>
+      <span class="tech-badge" role="listitem">Flask</span>
+      <span class="tech-badge" role="listitem">NLTK</span>
+      <span class="tech-badge" role="listitem">Plotly</span>
+      <span class="tech-badge" role="listitem">NumPy</span>
+      <span class="tech-badge" role="listitem">Pandas</span>
+      <span class="tech-badge" role="listitem">Vercel</span>
+      <span class="tech-badge" role="listitem">GitHub</span>
+    </div>
+  </div>
+</section>
+{% endblock %}

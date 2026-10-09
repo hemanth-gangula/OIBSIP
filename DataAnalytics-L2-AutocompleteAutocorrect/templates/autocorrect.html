@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% block title %}Autocorrect Playground — AutoNLP{% endblock %}
+
+{% block content %}
+<div class="container">
+  <header class="page-header" aria-labelledby="page-title">
+    <h1 class="page-header__title" id="page-title">Autocorrect Playground</h1>
+    <p class="page-header__subtitle">
+      Enter a (possibly misspelled) word and see correction suggestions from two
+      algorithmic approaches — Edit Distance and Probabilistic — ranked by their respective scores.
+    </p>
+  </header>
+
+  <div class="playground-layout">
+    <!-- ===== Input panel ===== -->
+    <section class="card playground-card" aria-labelledby="input-heading">
+      <h2 class="card__section-title" id="input-heading">Input</h2>
+
+      <!-- Sample misspelled words -->
+      <div class="sample-group" role="group" aria-label="Sample misspelled words">
+        <span class="sample-group__label">Try a sample:</span>
+        <div class="sample-buttons">
+          <button type="button" class="btn btn--sample" data-word="speling">speling</button>
+          <button type="button" class="btn btn--sample" data-word="recieve">recieve</button>
+          <button type="button" class="btn btn--sample" data-word="occurance">occurance</button>
+          <button type="button" class="btn btn--sample" data-word="seperate">seperate</button>
+          <button type="button" class="btn btn--sample" data-word="definately">definately</button>
+          <button type="button" class="btn btn--sample" data-word="accomodate">accomodate</button>
+          <button type="button" class="btn btn--sample" data-word="beleive">beleive</button>
+          <button type="button" class="btn btn--sample" data-word="transfered">transfered</button>
+        </div>
+      </div>
+
+      <!-- Word input -->
+      <div class="field-group">
+        <label class="field-label" for="word-input">Word to check</label>
+        <input
+          type="text"
+          id="word-input"
+          class="field-input"
+          maxlength="100"
+          placeholder="e.g. speling"
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="off"
+          spellcheck="false"
+          aria-describedby="word-hint"
+        />
+        <p id="word-hint" class="field-hint">Enter a single word (letters only). Press <kbd>Enter</kbd> to check.</p>
+      </div>
+
+      <!-- Approach selector -->
+      <fieldset class="fieldset">
+        <legend class="fieldset__legend">Correction approach</legend>
+        <div class="radio-group" role="radiogroup">
+          <label class="radio-label">
+            <input type="radio" name="approach" value="both" checked />
+            <span class="radio-custom" aria-hidden="true"></span>
+            Compare both
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="approach" value="edit_distance" />
+            <span class="radio-custom" aria-hidden="true"></span>
+            Edit Distance
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="approach" value="probabilistic" />
+            <span class="radio-custom" aria-hidden="true"></span>
+            Probabilistic
+          </label>
+        </div>
+      </fieldset>
+
+      <!-- Action buttons -->
+      <div class="action-buttons">
+        <button type="button" id="check-btn" class="btn btn--primary" aria-label="Check spelling">
+          Check Spelling
+        </button>
+        <button type="button" id="clear-btn" class="btn btn--ghost" aria-label="Clear input and results">
+          Clear
+        </button>
+      </div>
+    </section>
+
+    <!-- ===== Results panel ===== -->
+    <section class="card playground-card" aria-labelledby="results-heading" aria-live="polite" aria-atomic="true">
+      <h2 class="card__section-title" id="results-heading">Corrections</h2>
+
+      <!-- Loading -->
+      <div id="loading-area" class="loading-state" aria-label="Checking spelling" hidden>
+        <div class="spinner" aria-hidden="true"></div>
+        <p class="loading-state__text">Analysing word…</p>
+      </div>
+
+      <!-- Error -->
+      <div id="error-area" class="error-state" role="alert" hidden></div>
+
+      <!-- Empty state -->
+      <div id="empty-state" class="empty-state">
+        <p class="empty-state__icon" aria-hidden="true">🔍</p>
+        <p class="empty-state__text">Enter a word and click <strong>Check Spelling</strong> to see corrections.</p>
+      </div>
+
+      <!-- Results -->
+      <div id="results-area" hidden>
+        <!-- Input word + correct badge -->
+        <div id="word-display" class="word-display" aria-live="polite"></div>
+
+        <!-- Side-by-side when both, or single column otherwise -->
+        <div id="corrections-container" class="corrections-container"></div>
+      </div>
+    </section>
+  </div><!-- /playground-layout -->
+</div><!-- /container -->
+{% endblock %}
+
+{% block extra_js %}
+<script src="/js/autocorrect.js"></script>
+{% endblock %}

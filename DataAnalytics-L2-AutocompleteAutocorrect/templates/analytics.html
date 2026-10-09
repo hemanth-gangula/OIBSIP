@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block title %}Analytics Dashboard — AutoNLP{% endblock %}
+
+{% block content %}
+<div class="container">
+  <header class="page-header" aria-labelledby="page-title">
+    <h1 class="page-header__title" id="page-title">Analytics Dashboard</h1>
+    <p class="page-header__subtitle">
+      Interactive visualizations derived from the corpus and model evaluation data.
+      Charts are generated dynamically from the loaded model and evaluation results.
+    </p>
+  </header>
+
+  <!-- ===== Dataset stats card ===== -->
+  <section class="card stats-card" aria-labelledby="stats-heading">
+    <h2 class="card__section-title" id="stats-heading">Dataset &amp; Vocabulary Stats</h2>
+    <div id="stats-loading" class="loading-state" aria-label="Loading statistics">
+      <div class="spinner" aria-hidden="true"></div>
+      <p class="loading-state__text">Loading corpus statistics…</p>
+    </div>
+    <div id="stats-error" class="error-state" role="alert" hidden></div>
+    <dl class="stats-grid" id="stats-grid" hidden aria-label="Corpus statistics">
+      <div class="stat-item">
+        <dt class="stat-item__label">Vocabulary Size</dt>
+        <dd class="stat-item__value" id="stat-vocab-size">—</dd>
+      </div>
+      <div class="stat-item">
+        <dt class="stat-item__label">Total Tokens</dt>
+        <dd class="stat-item__value" id="stat-total-tokens">—</dd>
+      </div>
+      <div class="stat-item">
+        <dt class="stat-item__label">Avg. Word Frequency</dt>
+        <dd class="stat-item__value" id="stat-avg-freq">—</dd>
+      </div>
+      <div class="stat-item">
+        <dt class="stat-item__label">Most Frequent Word</dt>
+        <dd class="stat-item__value" id="stat-top-word">—</dd>
+      </div>
+    </dl>
+  </section>
+
+  <!-- ===== Top-20 words chart ===== -->
+  <section class="card chart-card" aria-labelledby="top-words-heading">
+    <h2 class="card__section-title" id="top-words-heading">Top 20 Most Frequent Words</h2>
+    <p class="chart-desc">Word frequency distribution from the <em>big.txt</em> corpus (stop words included).</p>
+    <div id="chart-loading-top" class="loading-state" aria-label="Loading chart">
+      <div class="spinner" aria-hidden="true"></div>
+    </div>
+    <div id="chart-top-words" class="chart-container" aria-label="Top 20 most frequent words bar chart" role="img"></div>
+  </section>
+
+  <!-- ===== Model comparison charts ===== -->
+  <div class="charts-row">
+    <section class="card chart-card" aria-labelledby="ac-comparison-heading">
+      <h2 class="card__section-title" id="ac-comparison-heading">Autocomplete: Model Accuracy</h2>
+      <p class="chart-desc">Bigram vs. Trigram — Top-1, Top-3 accuracy, and Mean Reciprocal Rank.</p>
+      <div id="chart-loading-ac" class="loading-state" aria-label="Loading chart">
+        <div class="spinner" aria-hidden="true"></div>
+      </div>
+      <div id="chart-autocomplete-comparison" class="chart-container" aria-label="Autocomplete model comparison bar chart" role="img"></div>
+    </section>
+
+    <section class="card chart-card" aria-labelledby="acr-comparison-heading">
+      <h2 class="card__section-title" id="acr-comparison-heading">Autocorrect: Approach Accuracy</h2>
+      <p class="chart-desc">Edit Distance vs. Probabilistic — Top-1 and Top-3 accuracy on 50 test pairs.</p>
+      <div id="chart-loading-acr" class="loading-state" aria-label="Loading chart">
+        <div class="spinner" aria-hidden="true"></div>
+      </div>
+      <div id="chart-autocorrect-comparison" class="chart-container" aria-label="Autocorrect approach comparison bar chart" role="img"></div>
+    </section>
+  </div>
+
+  <!-- ===== Download section ===== -->
+  <section class="card" aria-labelledby="downloads-heading">
+    <h2 class="card__section-title" id="downloads-heading">Download Prediction Data</h2>
+    <p class="card__text">
+      Download the raw CSV outputs generated during model evaluation.
+    </p>
+    <div class="download-buttons">
+      <a
+        class="btn btn--secondary"
+        href="/api/download/autocomplete_predictions.csv"
+        download
+        aria-label="Download autocomplete predictions CSV"
+      >
+        📥 autocomplete_predictions.csv
+      </a>
+      <a
+        class="btn btn--secondary"
+        href="/api/download/autocorrect_results.csv"
+        download
+        aria-label="Download autocorrect results CSV"
+      >
+        📥 autocorrect_results.csv
+      </a>
+    </div>
+  </section>
+
+</div><!-- /container -->
+{% endblock %}
+
+{% block extra_js %}
+<script src="/js/analytics.js"></script>
+{% endblock %}

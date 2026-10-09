@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Autocomplete &amp; Autocorrect NLP{% endblock %}</title>
+  <meta name="description" content="Interactive NLP web application demonstrating autocomplete and autocorrect using statistical language models." />
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Main stylesheet -->
+  <link rel="stylesheet" href="/css/main.css" />
+
+  <!-- Plotly.js CDN -->
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" defer></script>
+
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+  <!-- Skip to main content for keyboard / screen reader users -->
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  <!-- ===== Fixed top navigation ===== -->
+  <nav class="nav" role="navigation" aria-label="Main navigation">
+    <div class="nav__inner">
+      <!-- Logo / brand -->
+      <a class="nav__logo" href="/" aria-label="Autocomplete &amp; Autocorrect — Home">
+        <span class="nav__logo-icon" aria-hidden="true">⟨NLP⟩</span>
+        <span class="nav__logo-text">AutoNLP</span>
+      </a>
+
+      <!-- Desktop links -->
+      <ul class="nav__links" role="list">
+        <li><a class="nav__link{% if request.path == '/' %} nav__link--active{% endif %}" href="/">Home</a></li>
+        <li><a class="nav__link{% if request.path == '/autocomplete' %} nav__link--active{% endif %}" href="/autocomplete">Autocomplete</a></li>
+        <li><a class="nav__link{% if request.path == '/autocorrect' %} nav__link--active{% endif %}" href="/autocorrect">Autocorrect</a></li>
+        <li><a class="nav__link{% if request.path == '/analytics' %} nav__link--active{% endif %}" href="/analytics">Analytics</a></li>
+        <li><a class="nav__link{% if request.path == '/models' %} nav__link--active{% endif %}" href="/models">Models</a></li>
+        <li><a class="nav__link{% if request.path == '/about' %} nav__link--active{% endif %}" href="/about">About</a></li>
+      </ul>
+
+      <!-- Mobile hamburger button -->
+      <button
+        class="nav__hamburger"
+        id="nav-hamburger"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+        aria-label="Open navigation menu"
+        type="button"
+      >
+        <span class="nav__hamburger-bar" aria-hidden="true"></span>
+        <span class="nav__hamburger-bar" aria-hidden="true"></span>
+        <span class="nav__hamburger-bar" aria-hidden="true"></span>
+      </button>
+    </div>
+
+    <!-- Mobile menu (hidden by default) -->
+    <div class="nav__mobile" id="mobile-menu" role="menu" aria-hidden="true">
+      <ul class="nav__mobile-links" role="list">
+        <li><a class="nav__mobile-link" href="/" role="menuitem">Home</a></li>
+        <li><a class="nav__mobile-link" href="/autocomplete" role="menuitem">Autocomplete</a></li>
+        <li><a class="nav__mobile-link" href="/autocorrect" role="menuitem">Autocorrect</a></li>
+        <li><a class="nav__mobile-link" href="/analytics" role="menuitem">Analytics</a></li>
+        <li><a class="nav__mobile-link" href="/models" role="menuitem">Models</a></li>
+        <li><a class="nav__mobile-link" href="/about" role="menuitem">About</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- ===== Main content ===== -->
+  <main id="main-content" class="main-content" tabindex="-1">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- ===== Footer ===== -->
+  <footer class="footer" role="contentinfo">
+    <div class="footer__inner">
+      <div class="footer__section">
+        <p class="footer__title">Datasets</p>
+        <ul class="footer__list" role="list">
+          <li>
+            <a class="footer__link" href="https://norvig.com/big.txt" target="_blank" rel="noopener noreferrer">
+              big.txt — Peter Norvig's Text Corpus
+            </a>
+          </li>
+          <li>
+            <a class="footer__link" href="https://norvig.com/ngrams/spell-errors.txt" target="_blank" rel="noopener noreferrer">
+              spell-errors.txt — Norvig Spell Error Dataset
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div class="footer__section">
+        <p class="footer__title">Built with</p>
+        <p class="footer__text">Python · Flask · Plotly · NLTK · Vercel</p>
+      </div>
+      <div class="footer__section">
+        <p class="footer__title">Portfolio Project</p>
+        <p class="footer__text">Data Analytics Internship — OIBSIP</p>
+        <p class="footer__note">Statistical NLP models — not production AI</p>
+      </div>
+    </div>
+    <p class="footer__copy">&copy; 2025 Autocomplete &amp; Autocorrect NLP Project. Educational use.</p>
+  </footer>
+
+  <!-- Main JS (nav toggle + utilities) -->
+  <script src="/js/main.js"></script>
+
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

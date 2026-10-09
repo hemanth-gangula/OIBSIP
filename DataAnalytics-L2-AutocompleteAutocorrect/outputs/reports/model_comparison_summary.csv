@@ -1,0 +1,5 @@
+Model/Approach,Task,Top-1,Top-3,MRR,N
+Bigram,Autocomplete,0.305,0.57,0.422,200
+Trigram,Autocomplete,0.65,0.8,0.72,200
+EditDistance,Autocorrect,0.48,0.58,,50
+Probabilistic,Autocorrect,0.48,0.58,,50

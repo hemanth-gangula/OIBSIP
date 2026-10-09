@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+
+{% block title %}Autocomplete Playground — AutoNLP{% endblock %}
+
+{% block content %}
+<div class="container">
+  <header class="page-header" aria-labelledby="page-title">
+    <h1 class="page-header__title" id="page-title">Autocomplete Playground</h1>
+    <p class="page-header__subtitle">
+      Enter a text fragment and get next-word predictions from statistical language models
+      trained on Peter Norvig's <em>big.txt</em> corpus (~1.1M tokens).
+    </p>
+  </header>
+
+  <div class="playground-layout">
+    <!-- ===== Input panel ===== -->
+    <section class="card playground-card" aria-labelledby="input-heading">
+      <h2 class="card__section-title" id="input-heading">Input</h2>
+
+      <!-- Sample context buttons -->
+      <div class="sample-group" role="group" aria-label="Sample context phrases">
+        <span class="sample-group__label">Try a sample:</span>
+        <div class="sample-buttons">
+          <button type="button" class="btn btn--sample" data-sample="the quick brown">the quick brown</button>
+          <button type="button" class="btn btn--sample" data-sample="she said that">she said that</button>
+          <button type="button" class="btn btn--sample" data-sample="it is a">it is a</button>
+          <button type="button" class="btn btn--sample" data-sample="he went to the">he went to the</button>
+          <button type="button" class="btn btn--sample" data-sample="they were very">they were very</button>
+          <button type="button" class="btn btn--sample" data-sample="the united states">the united states</button>
+        </div>
+      </div>
+
+      <!-- Text area -->
+      <div class="field-group">
+        <label class="field-label" for="text-input">Your text</label>
+        <textarea
+          id="text-input"
+          class="field-textarea"
+          rows="4"
+          maxlength="500"
+          placeholder="Type or paste text here… (e.g. 'the weather is')"
+          aria-describedby="text-hint char-count"
+          spellcheck="true"
+        ></textarea>
+        <div class="field-meta">
+          <span id="text-hint" class="field-hint">Press <kbd>Ctrl</kbd>+<kbd>Enter</kbd> to get suggestions</span>
+          <span id="char-count" class="field-count" aria-live="polite">0 / 500</span>
+        </div>
+      </div>
+
+      <!-- Model selector -->
+      <fieldset class="fieldset">
+        <legend class="fieldset__legend">Language model</legend>
+        <div class="radio-group" role="radiogroup">
+          <label class="radio-label">
+            <input type="radio" name="model" value="both" checked aria-describedby="model-both-desc" />
+            <span class="radio-custom" aria-hidden="true"></span>
+            Both
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="model" value="bigram" aria-describedby="model-bigram-desc" />
+            <span class="radio-custom" aria-hidden="true"></span>
+            Bigram
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="model" value="trigram" aria-describedby="model-trigram-desc" />
+            <span class="radio-custom" aria-hidden="true"></span>
+            Trigram
+          </label>
+        </div>
+        <p id="model-bigram-desc" class="visually-hidden">Bigram: predicts next word from the last word</p>
+        <p id="model-trigram-desc" class="visually-hidden">Trigram: predicts next word from the last two words</p>
+        <p id="model-both-desc" class="visually-hidden">Show predictions from both Bigram and Trigram models</p>
+      </fieldset>
+
+      <!-- Action buttons -->
+      <div class="action-buttons">
+        <button type="button" id="submit-btn" class="btn btn--primary" aria-label="Get autocomplete suggestions">
+          Get Suggestions
+        </button>
+        <button type="button" id="clear-btn" class="btn btn--ghost" aria-label="Clear text and results">
+          Clear
+        </button>
+      </div>
+    </section>
+
+    <!-- ===== Results panel ===== -->
+    <section class="card playground-card" aria-labelledby="results-heading" aria-live="polite" aria-atomic="true">
+      <h2 class="card__section-title" id="results-heading">Suggestions</h2>
+
+      <!-- Loading indicator -->
+      <div id="loading-area" class="loading-state" aria-label="Loading suggestions" hidden>
+        <div class="spinner" aria-hidden="true"></div>
+        <p class="loading-state__text">Generating suggestions…</p>
+      </div>
+
+      <!-- Error message area -->
+      <div id="error-area" class="error-state" role="alert" hidden></div>
+
+      <!-- Empty state -->
+      <div id="empty-state" class="empty-state" aria-label="No suggestions yet">
+        <p class="empty-state__icon" aria-hidden="true">💬</p>
+        <p class="empty-state__text">Enter some text and click <strong>Get Suggestions</strong> to see predictions.</p>
+      </div>
+
+      <!-- Suggestions output -->
+      <div id="results-area" hidden>
+        <div id="context-display" class="context-display" aria-label="Context words used"></div>
+
+        <!-- Bigram results -->
+        <div id="bigram-results" class="model-results" hidden>
+          <h3 class="model-results__title">
+            <span class="badge badge--blue">Bigram</span> Predictions
+          </h3>
+          <p class="model-results__desc">Next word predicted from the last word in your text.</p>
+          <ol class="suggestions-list" id="bigram-list" aria-label="Bigram suggestions"></ol>
+        </div>
+
+        <!-- Trigram results -->
+        <div id="trigram-results" class="model-results" hidden>
+          <h3 class="model-results__title">
+            <span class="badge badge--teal">Trigram</span> Predictions
+          </h3>
+          <p class="model-results__desc">Next word predicted from the last two words in your text.</p>
+          <ol class="suggestions-list" id="trigram-list" aria-label="Trigram suggestions"></ol>
+        </div>
+      </div>
+    </section>
+  </div><!-- /playground-layout -->
+</div><!-- /container -->
+{% endblock %}
+
+{% block extra_js %}
+<script src="/js/autocomplete.js"></script>
+{% endblock %}

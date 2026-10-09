@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+
+{% block title %}About — AutoNLP{% endblock %}
+
+{% block content %}
+<div class="container">
+  <header class="page-header" aria-labelledby="page-title">
+    <h1 class="page-header__title" id="page-title">About This Project</h1>
+    <p class="page-header__subtitle">
+      Background, datasets, preprocessing pipeline, evaluation methodology, and attributions.
+    </p>
+  </header>
+
+  <!-- ===== Project overview ===== -->
+  <section class="card" aria-labelledby="overview-heading">
+    <h2 class="card__section-title" id="overview-heading">Project Overview</h2>
+    <p class="card__text">
+      This project is a full-stack NLP analytics application built as part of a
+      Data Analytics internship portfolio (OIBSIP). It demonstrates end-to-end data analytics:
+      raw corpus ingestion, tokenization, statistical language model construction,
+      algorithmic spelling correction, evaluation, and interactive visualization — all
+      served via a Flask web application deployed to Vercel.
+    </p>
+    <p class="card__text">
+      The core NLP models are implemented from scratch in Python:
+      a Bigram language model, a Trigram language model, an edit-distance spell corrector,
+      and a probabilistic spell corrector based on Peter Norvig's classic approach.
+      No pre-trained neural models are used.
+    </p>
+  </section>
+
+  <!-- ===== Datasets ===== -->
+  <section class="card" aria-labelledby="datasets-heading">
+    <h2 class="card__section-title" id="datasets-heading">Datasets</h2>
+
+    <div class="dataset-item">
+      <h3 class="dataset-item__title">
+        big.txt — Peter Norvig's Text Corpus
+        <a
+          class="dataset-item__link"
+          href="https://norvig.com/big.txt"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Download big.txt from norvig.com (opens in new tab)"
+        >↗ norvig.com/big.txt</a>
+      </h3>
+      <p class="dataset-item__desc">
+        A ~6.5 MB concatenated plain-text file compiled by Peter Norvig from public-domain books
+        and other English text. Used as the training corpus for all language models.
+        After tokenization it yields approximately <strong>1.1 million tokens</strong> and a
+        vocabulary of roughly <strong>29,000 unique words</strong>.
+      </p>
+      <p class="dataset-item__meta">Format: plain text · Size: ~6.5 MB · License: public domain</p>
+    </div>
+
+    <div class="dataset-item">
+      <h3 class="dataset-item__title">
+        spell-errors.txt — Norvig Spell Error Dataset
+        <a
+          class="dataset-item__link"
+          href="https://norvig.com/ngrams/spell-errors.txt"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Download spell-errors.txt from norvig.com (opens in new tab)"
+        >↗ norvig.com/ngrams/spell-errors.txt</a>
+      </h3>
+      <p class="dataset-item__desc">
+        A ~451 KB structured file listing correct English words and their commonly observed
+        misspellings, compiled by Peter Norvig. Each line contains a correct word followed by
+        a colon and comma-separated misspellings. Used to construct test pairs for evaluating
+        spell correctors and to validate that the correctors handle real-world error patterns.
+        The parsed dataset yields over <strong>39,000 misspelling/correction pairs</strong>.
+      </p>
+      <p class="dataset-item__meta">Format: structured text · Size: ~451 KB · License: public domain</p>
+    </div>
+  </section>
+
+  <!-- ===== Preprocessing pipeline ===== -->
+  <section class="card" aria-labelledby="pipeline-heading">
+    <h2 class="card__section-title" id="pipeline-heading">Preprocessing Pipeline</h2>
+    <ol class="pipeline-steps" aria-label="Preprocessing steps">
+      <li class="pipeline-step">
+        <strong>Tokenize</strong> — Lowercase the corpus and extract word tokens using a regex
+        (<code>[a-z]+</code>), discarding numbers, punctuation, and HTML artifacts.
+      </li>
+      <li class="pipeline-step">
+        <strong>Build vocabulary</strong> — Count unigram frequencies. Words appearing fewer than
+        a minimum threshold may be excluded depending on configuration.
+      </li>
+      <li class="pipeline-step">
+        <strong>Build bigrams</strong> — Slide a window of size 2 over the token list and count
+        all <code>(w₁, w₂)</code> pairs. Compute MLE probabilities per context word.
+      </li>
+      <li class="pipeline-step">
+        <strong>Build trigrams</strong> — Slide a window of size 3 and count all
+        <code>(w₁, w₂, w₃)</code> triples. Compute MLE probabilities per 2-word context.
+      </li>
+      <li class="pipeline-step">
+        <strong>Serialize</strong> — Dump the vocabulary, bigrams, and trigrams to
+        <code>data/processed/model_data.json</code> (~18.5 MB). This avoids re-processing
+        the corpus on every server startup. The correctors are reconstructed directly from
+        the vocabulary dict at load time.
+      </li>
+    </ol>
+  </section>
+
+  <!-- ===== Evaluation methodology ===== -->
+  <section class="card" aria-labelledby="eval-heading">
+    <h2 class="card__section-title" id="eval-heading">Evaluation Methodology</h2>
+
+    <h3 class="subsection-title">Autocomplete</h3>
+    <p class="card__text">
+      A held-out set of trigram contexts was created from the corpus. The last word of each
+      context was treated as the ground-truth target. The model was asked to predict the top-<em>k</em>
+      candidates given the preceding words. Metrics:
+    </p>
+    <ul class="metric-list">
+      <li><strong>Top-1 Accuracy</strong> — Fraction of test cases where the ground-truth word
+        was the model's first prediction.</li>
+      <li><strong>Top-3 Accuracy</strong> — Fraction of test cases where the ground-truth word
+        appeared anywhere in the top-3 predictions.</li>
+      <li><strong>Mean Reciprocal Rank (MRR)</strong> — Average of 1 / rank(correct word), where
+        rank is 0 for misses. Rewards models that rank the correct word higher.</li>
+    </ul>
+
+    <h3 class="subsection-title">Autocorrect</h3>
+    <p class="card__text">
+      50 misspelled/correct pairs were sampled from <code>spell-errors.txt</code>.
+      Each corrector was given the misspelled word and asked to return its top candidates.
+      Metrics:
+    </p>
+    <ul class="metric-list">
+      <li><strong>Top-1 Accuracy</strong> — Fraction of pairs where the corrector's top candidate
+        matched the intended correct word.</li>
+      <li><strong>Top-3 Accuracy</strong> — Fraction of pairs where the correct word appeared in
+        the top-3 suggestions.</li>
+    </ul>
+
+    <p class="card__text disclaimer-note">
+      All reported metrics are <strong>previously reported baseline results</strong>.
+      They were produced by the evaluation scripts in <code>src/evaluation.py</code>
+      and recorded in the project notebook; they are not independently re-verified at deployment time.
+    </p>
+  </section>
+
+  <!-- ===== Attributions ===== -->
+  <section class="card" aria-labelledby="attrib-heading">
+    <h2 class="card__section-title" id="attrib-heading">Attributions</h2>
+    <ul class="attrib-list">
+      <li>
+        <strong>Peter Norvig</strong> — Corpus (<a href="https://norvig.com/big.txt" target="_blank" rel="noopener noreferrer">big.txt</a>),
+        spell-error dataset (<a href="https://norvig.com/ngrams/spell-errors.txt" target="_blank" rel="noopener noreferrer">spell-errors.txt</a>),
+        and the probabilistic spell-correction algorithm described at
+        <a href="https://norvig.com/spell-correct.html" target="_blank" rel="noopener noreferrer">norvig.com/spell-correct.html</a>.
+      </li>
+      <li>
+        <strong>Flask</strong> — Web framework. <a href="https://flask.palletsprojects.com/" target="_blank" rel="noopener noreferrer">flask.palletsprojects.com</a>
+      </li>
+      <li>
+        <strong>Plotly</strong> — Interactive charting library. <a href="https://plotly.com/javascript/" target="_blank" rel="noopener noreferrer">plotly.com/javascript</a>
+      </li>
+      <li>
+        <strong>NLTK</strong> — Natural Language Toolkit. <a href="https://www.nltk.org/" target="_blank" rel="noopener noreferrer">nltk.org</a>
+      </li>
+      <li>
+        <strong>Inter font</strong> — By Rasmus Andersson, via Google Fonts.
+        <a href="https://fonts.google.com/specimen/Inter" target="_blank" rel="noopener noreferrer">fonts.google.com/specimen/Inter</a>
+      </li>
+    </ul>
+  </section>
+
+</div><!-- /container -->
+{% endblock %}

@@ -1,0 +1,31 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "app.py",
+      "use": "@vercel/python",
+      "config": {
+        "excludeFiles": [
+          "notebooks/**",
+          "tests/**",
+          ".pytest_cache/**",
+          "outputs/figures/**",
+          "__pycache__/**",
+          ".git/**",
+          "data/big.txt",
+          ".agents/**"
+        ]
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(css|js)/(.*)",
+      "dest": "/public/$1/$2"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/app.py"
+    }
+  ]
+}
