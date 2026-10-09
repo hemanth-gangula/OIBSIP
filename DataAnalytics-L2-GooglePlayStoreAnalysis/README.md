@@ -1,301 +1,357 @@
-# Google Play Store Analytics
-### Oasis Infobyte — Data Analytics Internship | Level 2 | Task 4
+# Unveiling the Android App Market: Google Play Store Analysis
+
+[![Python](https://img.shields.io/badge/Python-3.8%2B-blue.svg)](https://www.python.org/)
+[![Jupyter](https://img.shields.io/badge/Jupyter-Notebook-orange.svg)](https://jupyter.org/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
+## 📋 Project Overview
+
+This project is part of the **OASIS Infobyte Data Analytics Level 2 Internship** and provides a comprehensive analysis of the Google Play Store ecosystem. The analysis explores app characteristics, user behavior patterns, pricing strategies, and sentiment analysis of user reviews to derive actionable insights for Android app developers.
+
+### 🎯 Objective
+
+Perform an in-depth analysis of the Google Play Store to:
+- Clean and preprocess messy, real-world app data
+- Explore app categories, ratings, size, installs, and pricing trends
+- Analyze user review sentiment using Natural Language Processing
+- Identify data-driven insights for developers planning to launch Android apps
+- Provide strategic recommendations based on empirical evidence
 
 ---
 
-## Project Overview
+## 📊 Dataset Description
 
-**Title:** Unveiling the Android App Market — Google Play Store Analysis
+This project uses two datasets sourced from **Kaggle - Google Play Store Apps**:
 
-**Objective:** Perform a comprehensive analysis of the Google Play Store ecosystem — cleaning messy real-world data, exploring app categories, analysing ratings and pricing trends, and conducting VADER-powered sentiment analysis on user reviews.
+### 1. **googleplaystore.csv**
+Contains information about ~10,000 Android apps with the following columns:
 
-**Organisation:** Oasis Infobyte | Data Analytics Internship | Level 2 | Task 4
+| Column | Description |
+|--------|-------------|
+| `App` | Application name |
+| `Category` | App category (e.g., GAME, FAMILY, TOOLS) |
+| `Rating` | User rating (1.0 to 5.0) |
+| `Reviews` | Number of user reviews |
+| `Size` | App size (e.g., "19M", "Varies with device") |
+| `Installs` | Number of downloads (e.g., "10,000+") |
+| `Type` | Free or Paid |
+| `Price` | Price (e.g., "$4.99" or "0") |
+| `Content Rating` | Target audience (e.g., Everyone, Teen) |
+| `Genres` | Detailed genre classification |
+| `Last Updated` | Date of last update |
+| `Current Ver` | Current app version |
+| `Android Ver` | Minimum Android version required |
 
----
+### 2. **googleplaystore_user_reviews.csv**
+Contains user reviews with sentiment analysis:
 
-## Features
+| Column | Description |
+|--------|-------------|
+| `App` | Application name |
+| `Translated_Review` | Review text (translated to English) |
+| `Sentiment` | Pre-labeled sentiment (Positive, Negative, Neutral) |
+| `Sentiment_Polarity` | Polarity score (-1 to 1) |
+| `Sentiment_Subjectivity` | Subjectivity score (0 to 1) |
 
-| Feature | Description |
-|---------|-------------|
-| **Two separate upload flows** | Apps dataset and Reviews dataset are loaded and analysed independently |
-| **Data cleaning** | Fixes Installs (`'10,000+'`), Size (`'19M'`), Price (`'$2.99'`), Rating outliers, duplicates, nulls |
-| **Category analysis** | Bar chart of app distribution; identifies most and least saturated categories |
-| **Ratings analysis** | Distribution histogram + average rating per category |
-| **Size vs Installs** | Scatter plot with Pearson correlation and plain-English interpretation |
-| **Pricing analysis** | Free/Paid donut, price buckets, estimated revenue by category |
-| **VADER sentiment** | Every review is classified fresh (Positive / Negative / Neutral) — original column used only for validation |
-| **Sentiment by category** | App → Category mapping links Reviews to Apps dataset when both are uploaded |
-| **Interactive Plotly charts** | One Plotly chart per dashboard — zoom, hover, filter |
-| **Developer insights** | Five data-driven insights generated from actual data |
-| **Jupyter Notebook** | Full reproducible analysis document |
-| **Vercel deployment** | Production-ready Flask app |
-
----
-
-## Tech Stack
-
-- **Python 3.11**
-- **Flask 3.0** — web framework
-- **pandas / numpy** — data manipulation
-- **matplotlib / seaborn** — static charts
-- **Plotly** — interactive visualisations
-- **VADER (vaderSentiment)** — NLP sentiment analysis
-- **Jupyter Notebook** — analysis documentation
+**Source**: [Kaggle - Google Play Store Apps Dataset](https://www.kaggle.com/lava18/google-play-store-apps)
 
 ---
 
-## Dataset Sources
+## 🛠️ Technology Stack
 
-Both datasets are publicly available on Kaggle:
-
-| Dataset | Kaggle Link |
-|---------|------------|
-| Google Play Store Apps | https://www.kaggle.com/datasets/lava18/google-play-store-apps |
-| Google Play Store User Reviews | https://www.kaggle.com/datasets/lava18/google-play-store-apps |
-
-> **Raw datasets are intentionally excluded from this repository.**  
-> Download them from the Kaggle links above and upload via the application interface.
-
-Expected filenames:
-- `googleplaystore.csv`
-- `googleplaystore_user_reviews.csv`
+- **Python** 3.8+
+- **pandas** - Data manipulation and analysis
+- **NumPy** - Numerical computing
+- **Matplotlib** - Static visualizations
+- **Seaborn** - Statistical data visualization
+- **Plotly** - Interactive visualizations
+- **TextBlob** - Sentiment analysis and NLP
+- **Jupyter Notebook** - Interactive development environment
 
 ---
 
-## Dashboard Descriptions
-
-### Apps Dashboard
-Triggered by uploading `googleplaystore.csv`. Shows:
-- KPI cards (total apps, categories, average rating, free/paid split)
-- Data cleaning summary (original rows, duplicates removed, dtype corrections, null counts)
-- Category distribution bar chart
-- Interactive Plotly category explorer
-- Rating distribution + average rating by category
-- Size vs Installs scatter plot with Pearson correlation
-- Free/Paid donut chart
-- Paid app price distribution
-- Estimated revenue by category (with disclaimer)
-- Five developer insights
-
-### Reviews Dashboard
-Triggered by uploading `googleplaystore_user_reviews.csv`. Shows:
-- KPI cards (total reviews, positive/negative/neutral counts and percentages, average compound score)
-- Data cleaning summary
-- VADER methodology note
-- Sentiment donut + bar chart
-- VADER compound score histogram
-- Sentiment by category (only when Apps dataset is also loaded)
-- Interactive Plotly sentiment chart
-- VADER vs original label agreement (validation check)
-- Three sentiment insights
-
----
-
-## Sentiment Methodology
-
-**Library:** VADER (Valence Aware Dictionary and sEntiment Reasoner)
-
-VADER is a rule-based NLP model optimised for short social-media texts. Each review text is passed through the `SentimentIntensityAnalyzer` to produce a compound score (−1 to +1):
-
-| Score | Label |
-|-------|-------|
-| ≥ 0.05 | Positive |
-| ≤ −0.05 | Negative |
-| −0.05 to 0.05 | Neutral |
-
-The existing `Sentiment` column in the Kaggle dataset is used **only** as a validation reference — all dashboard classifications are produced fresh by VADER.
-
----
-
-## Data Cleaning Methodology
-
-### Apps Dataset
-| Column | Issue | Fix |
-|--------|-------|-----|
-| `Installs` | `'10,000+'` string | Strip `,` and `+`, cast to float |
-| `Size` | `'19M'`, `'512k'` string | Convert MB/KB to float (MB) |
-| `Price` | `'$2.99'` string | Strip `$`, cast to float |
-| `Rating` | Non-numeric, out-of-range | Coerce to numeric, set invalid to NaN |
-| `Reviews` | String | Cast to integer |
-| Duplicates | Exact row duplicates + multi-row same App | Drop exact dupes; keep highest-reviews entry per App |
-| Nulls | Missing App or Category | Dropped |
-
-### Reviews Dataset
-| Step | Action |
-|------|--------|
-| Exact duplicates | Dropped |
-| Null review text | Dropped |
-| Empty strings | Dropped |
-| Null App name | Dropped |
-
----
-
-## Revenue Estimate Disclaimer
-
-Revenue estimates shown in the Apps dashboard are **indicative only**.
-
-Formula: `Price_USD × Installs`
-
-The `Installs` column in the Kaggle dataset stores the lower bound of a reported range (e.g. `'10,000+'` → `10,000`). Actual install counts are likely significantly higher. This figure does not represent real company revenue and should not be used for financial decisions.
-
----
-
-## Visualisations
-
-| Chart | Type | Dashboard |
-|-------|------|-----------|
-| App distribution by category | Horizontal bar (seaborn) | Apps |
-| Interactive category explorer | Plotly bar | Apps |
-| Rating distribution | Histogram (matplotlib) | Apps |
-| Average rating by category | Horizontal bar (seaborn) | Apps |
-| Size vs Installs | Scatter (matplotlib) | Apps |
-| Free vs Paid | Donut (matplotlib) | Apps |
-| Price distribution | Bar (seaborn) | Apps |
-| Revenue by category | Horizontal bar (seaborn) | Apps |
-| Sentiment distribution | Donut (matplotlib) | Reviews |
-| Sentiment counts | Bar (matplotlib) | Reviews |
-| Compound score histogram | Histogram (matplotlib) | Reviews |
-| Sentiment by category | Stacked horizontal bar (seaborn) | Reviews |
-| Interactive sentiment | Plotly stacked bar / pie | Reviews |
-
----
-
-## Jupyter Notebook
-
-**File:** `Google_Play_Store_Analysis.ipynb`
-
-Sections:
-1. Project introduction
-2. Import libraries
-3. Load Apps dataset
-4. Load User Reviews dataset
-5. Inspect datasets
-6. Data cleaning — Apps
-7. Category analysis
-8. Ratings analysis
-9. Size vs Installs
-10. Pricing analysis
-11. Revenue estimation
-12. Data cleaning — Reviews
-13. VADER sentiment analysis
-14. Sentiment by category
-15. Interactive Plotly visualisations
-16. Developer insights
-17. Conclusion
-
----
-
-## Local Setup
-
-### Requirements
-- Python 3.10+
-- pip
-
-### Install
-
-```bash
-# Clone the repository
-git clone https://github.com/<your-username>/OIBSIP.git
-cd OIBSIP/DataAnalytics-L2-GooglePlayStoreAnalysis
-
-# Create virtual environment
-python -m venv .venv
-.venv\Scripts\activate      # Windows
-# source .venv/bin/activate # macOS/Linux
-
-# Install dependencies
-pip install -r requirements.txt
-```
-
-### Run
-
-```bash
-python app.py
-```
-
-Open `http://localhost:5000` in your browser.
-
-### Jupyter Notebook
-
-```bash
-jupyter notebook Google_Play_Store_Analysis.ipynb
-```
-
-Place `googleplaystore.csv` and `googleplaystore_user_reviews.csv` in the same directory before running.
-
----
-
-## Project Structure
+## 📁 Folder Structure
 
 ```
 DataAnalytics-L2-GooglePlayStoreAnalysis/
-│
-├── app.py                          # Flask application
-├── data_processor.py               # Apps dataset loading, cleaning, analysis
-├── sentiment_analyzer.py           # VADER sentiment analysis
-├── visualizations.py               # matplotlib/seaborn/Plotly chart generation
-├── requirements.txt                # Pinned Python dependencies
-├── vercel.json                     # Vercel deployment config
+├── data/
+│   ├── googleplaystore.csv
+│   └── googleplaystore_user_reviews.csv
+├── notebooks/
+│   └── Google_Play_Store_Analysis.ipynb
+├── outputs/
+│   ├── figures/                          # Generated charts and visualizations
+│   └── cleaned_data/                     # Cleaned datasets
 ├── README.md
-├── Google_Play_Store_Analysis.ipynb
-│
-├── templates/
-│   ├── index.html                  # Landing page (two separate upload buttons)
-│   ├── apps_dashboard.html         # Apps dataset dashboard
-│   └── reviews_dashboard.html      # Reviews dataset dashboard
-│
-├── static/
-│   ├── css/
-│   │   └── style.css
-│   └── js/
-│       └── upload.js
-│
-└── uploads/                        # Temporary runtime only — gitignored
+├── requirements.txt
+└── .gitignore
 ```
 
 ---
 
-## GitHub Repository
+## 🚀 Installation Instructions
 
-**Repository:** `OIBSIP`
+### Prerequisites
+- Python 3.8 or higher
+- pip package manager
+- Jupyter Notebook
 
-**Path:** `DataAnalytics-L2-GooglePlayStoreAnalysis/`
+### Setup Steps
 
-> This project does not modify any other task in the repository.
+1. **Clone or navigate to the project directory**:
+   ```bash
+   cd DataAnalytics-L2-GooglePlayStoreAnalysis
+   ```
 
----
+2. **Install required dependencies**:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-## Deployment
-
-### Vercel
-
-This app is configured for Vercel serverless deployment via `vercel.json`.
-
-```bash
-# Install Vercel CLI
-npm i -g vercel
-
-# Deploy
-vercel --prod
-```
-
-**Live Demo:** *(add URL after deployment)*
-
-### Vercel Limitations
-
-- Serverless functions have execution time limits (~10 s for the free tier). For large datasets, consider pre-processing or chunked uploads.
-- The `/tmp` directory is used for uploads in serverless environments. Persistent storage is not available between requests.
-- Large matplotlib figures may approach memory limits on the free tier.
+3. **Download TextBlob corpora** (required for sentiment analysis):
+   ```bash
+   python -m textblob.download_corpora
+   ```
 
 ---
 
-## Limitations
+## 💻 How to Run
 
-- Revenue estimates use lower-bound install counts and are indicative only.
-- Sentiment analysis accuracy depends on review text quality; short or ambiguous reviews may be classified as Neutral.
-- Category sentiment requires both datasets to be uploaded in the same server session.
-- The Kaggle dataset was collected in 2018 — current Play Store data will differ.
+1. **Open a terminal** at the project root directory
+
+2. **Launch Jupyter Notebook**:
+   ```bash
+   jupyter notebook
+   ```
+
+3. **Navigate to** `notebooks/Google_Play_Store_Analysis.ipynb`
+
+4. **Run all cells sequentially** or use "Run All" from the Cell menu
+
+5. **View outputs** in the notebook and check the `outputs/` folder for:
+   - Cleaned datasets in `outputs/cleaned_data/`
+   - Generated charts in `outputs/figures/`
 
 ---
 
-*Built for the Oasis Infobyte Data Analytics Internship — Level 2 — Task 4.*
+## 🧹 Data Cleaning Methodology
+
+The project implements a rigorous data cleaning process to handle real-world data quality issues:
+
+### Key Cleaning Steps:
+
+1. **Missing Value Treatment**
+   - Analyzed missing value patterns across all columns
+   - Applied justified imputation strategies (median for numerical, mode for categorical)
+   - Documented exclusions where imputation was inappropriate
+
+2. **Data Type Conversions**
+   - **Installs**: Removed `+` and `,` symbols, converted to integer
+   - **Price**: Removed `$` symbol, converted to float
+   - **Size**: Standardized units (M, k), handled "Varies with device"
+   - **Rating**: Converted to numeric, filtered invalid ratings (outside 1-5 range)
+   - **Reviews**: Converted to integer type
+
+3. **Duplicate Removal**
+   - Identified and removed duplicate app entries
+   - Preserved the most recent or complete record where applicable
+
+4. **Data Validation**
+   - Checked for logical inconsistencies (e.g., free apps with prices)
+   - Validated ranges for Rating, Installs, and Price
+   - Standardized text columns (category names, app names)
+
+5. **Dataset Merging**
+   - Merged app data with user reviews using app name as key
+   - Handled unmatched records and documented join results
+
+**Result**: Clean, analysis-ready datasets saved to `outputs/cleaned_data/` with comprehensive documentation of all transformations.
+
+---
+
+## 📈 Analysis Overview
+
+The Jupyter notebook contains **15 comprehensive sections**:
+
+### Section 1: Project Overview
+Introduction to the project, business problem, and analytical approach.
+
+### Section 2: Dataset Description
+Detailed exploration of dataset structure, columns, and data types.
+
+### Section 3: Import Libraries and Load Data
+Environment setup and data loading with robust error handling.
+
+### Section 4: Initial Data Inspection
+Comprehensive examination of raw data quality, dimensions, and statistics.
+
+### Section 5: Data Cleaning
+Systematic cleaning process with justifications for each transformation.
+
+### Section 6: Category Analysis
+- Distribution of apps across categories
+- Identification of saturated vs. niche categories
+- Market opportunity analysis
+
+### Section 7: Ratings Analysis
+- Rating distribution patterns
+- Category-wise average ratings
+- Quality benchmarks by category
+
+### Section 8: App Size and Installs Analysis
+- Relationship between app size and download counts
+- Correlation analysis
+- Optimal size recommendations
+
+### Section 9: Pricing Analysis
+- Free vs. paid app comparison
+- Price distribution analysis
+- Theoretical revenue estimation by category
+- **Note**: Estimates are theoretical (Price × Installs) and exclude actual purchases, refunds, platform fees, and taxes
+
+### Section 10: User Review Sentiment Analysis
+- Sentiment classification using TextBlob
+- Distribution of positive, negative, and neutral reviews
+- Example reviews with predicted sentiment
+- Sentiment scoring methodology
+
+### Section 11: Sentiment by Category
+- Category-wise sentiment patterns
+- Identification of categories with positive/negative user perception
+- Review volume considerations
+
+### Section 12: Interactive Visualization
+- Dynamic Plotly charts for enhanced data exploration
+- Interactive filtering and hover information
+- Category and rating visualizations
+
+### Section 13: Key Insights
+Data-driven findings derived from actual analysis results, including:
+- Market saturation patterns
+- Rating trends by category
+- Size-install relationships
+- Free vs. paid dynamics
+- Sentiment patterns
+
+### Section 14: Business Recommendations
+Actionable strategies for app developers based on empirical evidence from the analysis.
+
+### Section 15: Conclusion and Limitations
+Summary of findings, business value, and acknowledgment of data quality constraints and analytical limitations.
+
+---
+
+## 🔍 Key Findings
+
+> **Note**: All findings are generated from actual data analysis executed in the Jupyter notebook. The specific insights depend on the dataset characteristics and cleaning decisions applied during analysis.
+
+Key insight areas include:
+
+- **Market Saturation**: Identification of highly competitive vs. underserved categories
+- **Quality Benchmarks**: Average rating expectations by category
+- **Size Optimization**: Relationship between app size and download success
+- **Pricing Strategy**: Revenue potential and free vs. paid app dynamics
+- **User Sentiment**: Categories with positive user reception and pain points
+- **Update Frequency**: Impact of regular updates on ratings and reviews
+
+*For detailed findings with supporting visualizations and statistics, please refer to Section 13 of the Jupyter notebook.*
+
+---
+
+## 💡 Business Recommendations
+
+Strategic recommendations for Android app developers are provided in Section 14 of the notebook, covering:
+
+- **Category Selection**: Data-driven guidance on category opportunities
+- **Quality Targets**: Rating benchmarks to aim for in your category
+- **Size Optimization**: Recommendations for app size based on download patterns
+- **Pricing Strategy**: Insights on free vs. paid models and optimal pricing
+- **User Experience**: Sentiment analysis findings to improve user satisfaction
+- **Competitive Positioning**: Strategies based on market saturation analysis
+
+*Each recommendation is directly linked to analysis results with supporting evidence.*
+
+---
+
+## ⚠️ Limitations and Considerations
+
+1. **Installs ≠ Purchases**
+   - Install counts represent downloads, not actual purchases for paid apps
+   - Revenue estimates are theoretical and do not reflect actual earnings
+   - Excludes refunds, platform fees (30%), taxes, and regional pricing
+
+2. **Missing Data**
+   - Some apps lack ratings or have incomplete information
+   - Missing values may introduce bias in category comparisons
+
+3. **Temporal Constraints**
+   - Data represents a snapshot from a specific time period
+   - App market dynamics change rapidly
+   - Current trends may differ from dataset period
+
+4. **Sentiment Analysis Limitations**
+   - TextBlob has inherent accuracy constraints
+   - Sarcasm and context-dependent language may be misclassified
+   - Pre-labeled sentiment may not match TextBlob classifications
+
+5. **Correlation vs. Causation**
+   - Statistical relationships do not imply causal links
+   - Multiple confounding factors influence app success
+
+6. **Sample Size Variations**
+   - Different categories have vastly different app counts
+   - Comparisons should account for sample size differences
+
+---
+
+## 📂 Generated Outputs
+
+Upon running the analysis, the following outputs are generated:
+
+### `outputs/cleaned_data/`
+- `cleaned_apps.csv` - Cleaned and transformed app dataset
+- `cleaned_reviews.csv` - Processed user reviews dataset
+- `merged_data.csv` - Combined app and review data (if applicable)
+
+### `outputs/figures/`
+Multiple visualizations saved as PNG/HTML files:
+- Category distribution charts
+- Rating distribution histograms
+- Size vs. installs scatter plots
+- Price distribution visualizations
+- Sentiment analysis charts
+- Interactive Plotly dashboards
+
+---
+
+## 👨‍💻 Author
+
+**OASIS Infobyte Data Analytics Level 2 Intern**
+
+---
+
+## 📝 License
+
+This project is created for educational purposes as part of the OASIS Infobyte internship program.
+
+---
+
+## 🙏 Acknowledgments
+
+- **OASIS Infobyte** for the internship opportunity
+- **Kaggle** and dataset contributors for providing the Google Play Store data
+- **Open-source community** for the excellent Python data science libraries
+
+---
+
+## 📧 Contact
+
+For questions or feedback about this project, please reach out through the OASIS Infobyte internship portal.
+
+---
+
+**Last Updated**: 2024
+
+---
+
+*This project demonstrates data cleaning, exploratory data analysis, sentiment analysis, and business intelligence skills applied to a real-world dataset.*
