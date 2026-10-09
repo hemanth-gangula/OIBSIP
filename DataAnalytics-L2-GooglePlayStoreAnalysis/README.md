@@ -260,9 +260,9 @@ Summary of findings, business value, and acknowledgment of data quality constrai
 
 | Sentiment | Count | Share |
 |-----------|-------|-------|
-| Positive | 17,873 | **60.2%** |
-| Neutral | 6,443 | 21.7% |
-| Negative | 5,376 | 18.1% |
+| Positive | 19,015 | **64.0%** |
+| Negative | 6,321 | 21.3% |
+| Neutral | 4,356 | 14.7% |
 
 ### Data-Driven Insights
 
@@ -270,7 +270,7 @@ Summary of findings, business value, and acknowledgment of data quality constrai
 
 2. **Average rating is 4.19 with a left-skewed distribution.** Most apps cluster between 4.0 and 4.5. Falling below 4.0 is a significant signal of poor quality relative to market norms.
 
-3. **60% of reviews express positive sentiment.** The platform leans strongly positive, meaning negative review spikes are genuine warning signs worth monitoring in real time.
+3. **64% of reviews express positive sentiment.** The platform leans strongly positive, meaning negative review spikes are genuine warning signs worth monitoring in real time.
 
 4. **App size has a modest positive log-correlation with installs (r = 0.33).** Larger apps (games, productivity) tend to accumulate more downloads, but size alone is a weak predictor — quality and category matter more.
 
@@ -284,7 +284,7 @@ Based on the actual analysis results:
 
 1. **Go free-to-download.** With 92.6% of apps being free, a paid upfront model severely limits discoverability. Use in-app purchases or subscriptions instead.
 
-2. **Target a 4.2+ rating from launch.** The market average is 4.19; staying at or above this threshold is table stakes. Respond to negative reviews early — 18.1% of user sentiment is negative, and addressing it moves the needle.
+2. **Target a 4.2+ rating from launch.** The market average is 4.19; staying at or above this threshold is table stakes. Respond to negative reviews early — 21.3% of user sentiment is negative, and addressing it moves the needle.
 
 3. **Keep app size proportional to value.** There is no strong penalty for larger apps if the value justifies it (r = 0.33 with installs), but bloat for its own sake discourages installs. Optimise assets and defer non-critical downloads.
 

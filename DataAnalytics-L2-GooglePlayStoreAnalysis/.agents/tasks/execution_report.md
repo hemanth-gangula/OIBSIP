@@ -48,9 +48,9 @@ The full analysis pipeline ran to completion without any errors. All output file
 
 | Sentiment | Count | Percentage |
 |-----------|-------|------------|
-| Positive | 17,873 | 60.2% |
-| Neutral | 6,443 | 21.7% |
-| Negative | 5,376 | 18.1% |
+| Positive | 19,015 | 64.0% |
+| Negative | 6,321 | 21.3% |
+| Neutral | 4,356 | 14.7% |
 
 ### Size vs. Installs Correlation
 - Raw correlation: 0.1689  
@@ -106,7 +106,7 @@ None. The script ran cleanly on the first attempt.
 
 1. **Market is dominated by free apps (92.6%)** — paid apps are a small niche; developers relying on paid downloads alone face a difficult market.
 2. **Average rating is high (4.19)** — the distribution is left-skewed, meaning users tend to rate apps highly or not at all; ratings below 4.0 stand out negatively.
-3. **60% of reviews are positive** — TextBlob sentiment confirms generally favourable user sentiment across the platform; categories with high negative sentiment are outliers worth investigating.
+3. **60% of reviews are positive** — TextBlob sentiment confirms generally favourable user sentiment across the platform; 21.3% are negative — categories with high negative sentiment are outliers worth investigating.
 4. **Size has a modest positive correlation with installs (log r = 0.33)** — larger apps (games, productivity suites) tend to accumulate more downloads, but size alone is not a strong predictor.
 5. **Family and Game categories have the most apps** — highly saturated; new entrants should consider differentiation or less competitive verticals.
 
