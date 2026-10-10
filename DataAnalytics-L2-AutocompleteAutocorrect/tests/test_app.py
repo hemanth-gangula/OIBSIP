@@ -140,3 +140,44 @@ class TestApiAnalytics:
         data = resp.get_json()
         assert "top_20_words" in data
         assert len(data["top_20_words"]) == 20
+
+
+# ---------------------------------------------------------------------------
+# Static assets
+# ---------------------------------------------------------------------------
+
+class TestStaticAssets:
+    def test_css_returns_200(self, client):
+        resp = client.get("/static/css/main.css")
+        assert resp.status_code == 200
+        assert "text/css" in resp.content_type
+
+    def test_main_js_returns_200(self, client):
+        resp = client.get("/static/js/main.js")
+        assert resp.status_code == 200
+        assert "javascript" in resp.content_type
+
+    def test_autocomplete_js_returns_200(self, client):
+        resp = client.get("/static/js/autocomplete.js")
+        assert resp.status_code == 200
+        assert "javascript" in resp.content_type
+
+    def test_autocorrect_js_returns_200(self, client):
+        resp = client.get("/static/js/autocorrect.js")
+        assert resp.status_code == 200
+        assert "javascript" in resp.content_type
+
+    def test_analytics_js_returns_200(self, client):
+        resp = client.get("/static/js/analytics.js")
+        assert resp.status_code == 200
+        assert "javascript" in resp.content_type
+
+    def test_index_html_references_static_css(self, client):
+        resp = client.get("/")
+        assert resp.status_code == 200
+        assert b"/static/css/main.css" in resp.data
+
+    def test_index_html_references_static_js(self, client):
+        resp = client.get("/")
+        assert resp.status_code == 200
+        assert b"/static/js/main.js" in resp.data

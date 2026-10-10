@@ -42,7 +42,7 @@ from autocorrect import EditDistanceCorrector, ProbabilisticCorrector
 app = Flask(
     __name__,
     template_folder=os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates"),
-    static_folder=os.path.join(os.path.dirname(os.path.abspath(__file__)), "public"),
+    static_folder=os.path.join(os.path.dirname(os.path.abspath(__file__)), "static"),
     static_url_path="/static",
 )
 CORS(app)
@@ -515,19 +515,17 @@ def api_download(filename: str):
 
 
 # ---------------------------------------------------------------------------
-# Static asset fallback routes (local dev — Vercel CDN serves public/ directly)
+# Favicon (served from static/)
 # ---------------------------------------------------------------------------
 
-@app.route("/css/<path:filename>")
-def serve_css(filename: str):
-    css_dir = os.path.join(PROJECT_ROOT, "public", "css")
-    return send_from_directory(css_dir, filename)
-
-
-@app.route("/js/<path:filename>")
-def serve_js(filename: str):
-    js_dir = os.path.join(PROJECT_ROOT, "public", "js")
-    return send_from_directory(js_dir, filename)
+@app.route("/favicon.ico")
+def favicon():
+    return send_from_directory(
+        os.path.join(PROJECT_ROOT, "static"),
+        "favicon.ico",
+        mimetype="image/vnd.microsoft.icon",
+    ) if os.path.isfile(os.path.join(PROJECT_ROOT, "static", "favicon.ico")) \
+      else ("", 204)
 
 
 # ---------------------------------------------------------------------------

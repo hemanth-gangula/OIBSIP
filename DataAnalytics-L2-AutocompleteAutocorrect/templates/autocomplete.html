@@ -131,5 +131,5 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="/js/autocomplete.js"></script>
+<script src="{{ url_for('static', filename='js/autocomplete.js') }}"></script>
 {% endblock %}
